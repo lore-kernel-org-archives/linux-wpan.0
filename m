@@ -1,56 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=79.135.106.29
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794090780;
-	b=41tPzA5nw3InsTJ8MpeiCe/CAwp26xHcU+3uEjGGhs6226K6zKJmijBADvLRW2Zl+9Dm
-	 lCt2//VNjXra3G2TzbV5iRTfVVcOdn+F8yhdJ2MGSotpyPCRX4jrGMITXZm2jLSRcdEKB
-	 IPByAh3BlB3chiGe54ocuSkK2Bex5bKm5f/ce2Ay+dbx3wTCPMJpYQsMTPu/eNLuhzdm/
-	 hL9OXbo6Mqe2PyPZsACkiRBVLXjCzG9xCkS1XeLqOE47zphuyL2cKkATi6NPe/Idz068G
-	 eFWNy7HAihh+GCESaUiLtv11c3+i2I3BsY01QiSjtUwI1IJZMJ3RqYl5XDRy1PcNcyQ==
+	t=1794105024;
+	b=Uefl0O5C+wAZROjRYE4f/B54aCfdHFX/QiVpHXbLc1CBoY2frU8TvqJ2igojpTG1vMaK
+	 1GSJ/c56S971yRe4daU9qiaKriqZ9oVN3z53dRTFfR9tVBfYpSdujzMe5YAFlcIXYyO/U
+	 1QT39d9s2k4gawdkdO95lim16mdOmypYGNjp2goBEp1ZGYnP82g5Ztqm7HzwNKRQ06jd9
+	 zCxqtNt0gdAYj/0z2aexEF71lXPLownMQTpyYrZyel6uX+qkhmIj88Iy9BxXM4HL2hYW0
+	 qRtlWC9bNaSETGgcecJzjEn+oZ8q11sARKHxBWDHc+2selDGtn7T+Yuga/C0f4c4d2g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794090780;
-	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
-	 Feedback-ID:X-Pm-Message-ID:MIME-Version:Content-Type;
-	bh=Fy1q9DDL6EW09W8M1xaP5lNpvYiNE8bBDgxpWOc4HI4=;
-	b=FnHOu4dM5ZMODCh0ehzrA8CbgqFWboRtD5CVVeFQmeQvim3vuKWzXbIWrswQx8wWFpEc
-	 6N7mknHa7cOUGe4jpUn1htxYx/9SsZ15xDrsjEMwgmyY1mero+jkWj7vuLqMI7KYlTjSu
-	 6KB7Ywc0sUQWEohc/f6x4X7wbaPsDjUWRdbTTZefPxEtnu8teYou2zAQmEEZylu3jdZ/5
-	 Ldrf9Z67414VV2V403iuPiN6E8lYimkGJY6JM9wzU5fEesLj1RTe52qaqdPxNmg+q3a2e
-	 BgZfiB6LCiMPYrFajDvzBou/gxaa+tZsx6ZM5pEVSd8i8P9doqFr8DzWeKoG84yPyuA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794105024;
+	h=Received:DKIM-Signature:Subject:From:To:Cc:Date:Message-ID:
+	 In-Reply-To:References:X-sashiko-severity:Content-Type:
+	 Content-Transfer-Encoding:MIME-Version;
+	bh=1lWeEyUKuoZkaOXEyaoOnoSDcXqbGvsVOE/foLlRDoU=;
+	b=5LlFg9R6A1vQsYATEAe47qc7PCEYTWRJCCAexkEXyqmpBgrEtYUU15vfuSPr+Jd+dMPL
+	 MG4WoLI761Z11nh8qZh8DGt2fv3udk9Ofok1hUEyEvWdf3YRta/xejK5cR70KOS6TKt+t
+	 SWUYo9PMNyab1+RI/OvWgUo3SsyAWcXnfiqdKS9Ne34aymnOTBcIoNObw0j+R7ahjhUZ4
+	 pQRyMMtNNmf55r33Q5A1k1HO2pz7hCdhNipZo+2SKi1SkRZ5i+KbfW+P5npF3poDoMszM
+	 VNXnuLjHgGOV3XCM1VofIcLE0RKdRHsbPh31ZVI3B0FRtfUTDDWfuXutfo5+o/pl8kg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=protonmail.com;
-	spf=pass smtp.mailfrom=protonmail.com;
-	dkim=pass header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b=uc7dTI9R;
-	arc=none smtp.remote-ip=79.135.106.29
-Received: from mail-10629.protonmail.ch (mail-10629.protonmail.ch [79.135.106.29])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZN3Hj6J3;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8635606A32C;
-	Sat,  7 Nov 2026 22:32:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E8635606A32C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D504606A31A;
+	Sun,  8 Nov 2026 02:30:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b=uc7dTI9R
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1794090776; x=1794349976;
-	bh=Fy1q9DDL6EW09W8M1xaP5lNpvYiNE8bBDgxpWOc4HI4=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=uc7dTI9R3L2Hw2ANmfucfPYrfWCA65/PP3HhZK6jt8ou4SiNnux7Q8NMEbjA4vZbi
-	 NfuKLPry/mWuivbRoAk6p/rxpojGZFriwrrQS8C7FDPi55m6kiCbTm1ptlEYaU3WT+
-	 qX42CxpJNlq3Khe53upLIzbCQ/HHyaHgdppPJeXz1qBgSfvhKZID+TyYXV5uaZaSte
-	 GlgZO3h0E8xKNDQtyt7R2TkYcVqgDUVkIBE762xcMgbHVLObPKX9n6Uf8iWoOrWHZs
-	 /6P/YDbgwLa7ZdTQfr3l1D74Oy3/mZDUIBseCrBkFn7gS0VMyc5+/yisFPsfnv6cJF
-	 3cbW6WNS+sg+g==
-Date: Sat, 07 Nov 2026 22:32:51 +0000
-To: linux-wpan@vger.kernel.org, netdev@vger.kernel.org
-From: Ryan Prinz <rc4d5a@protonmail.com>
-Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, Miquel Raynal <miquel.raynal@bootlin.com>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, Ryan Prinz <rc4d5a@protonmail.com>
-Subject: [PATCH] ieee802154: 6lowpan: validate fragment offset against datagram size
-Message-ID: <20261107223217.718177-1-rc4d5a@protonmail.com>
-Feedback-ID: 190731814:user:proton
-X-Pm-Message-ID: b722c76460f019a123dd4092d1ad458167b9bc77
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=ZN3Hj6J3
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CD6E1F0089F;
+	Sun,  8 Nov 2026 02:30:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794105023;
+	bh=1lWeEyUKuoZkaOXEyaoOnoSDcXqbGvsVOE/foLlRDoU=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=ZN3Hj6J3ehaoFn35x3uJX+ELV6YCIBN1QchPYpOo+g/TQA8K8BKLYWlW2+62XyqNW
+	 2kO3hhJ9Islqls7ilR6Kwi8UQx4ODvN+0SewwFEVzQVhJasbTVyZbQzzo4MjXdWI5g
+	 1V2FdIZBYI1MnDaQoin/2IqKiwGTej+FGXAhxJOhc8ZiaeFN426iq0rp8mota6trs+
+	 ARkimQNuzYGcz/df46meIrWZBmHJZdLwg2NsHl9+jAGU17PN4N4w9XcU8p+ARD3pmM
+	 NFcyumxJglm3Ekv23e0ZwhP+2DHLY4PXgKlLugYb77lM6OBoqUM3I/yAoNqKrA8QOd
+	 yuVwKBbWOKjUw==
+Subject:
+ Re: [PATCH] ieee802154: atusb: drop the URB reference after a failed resubmit
+From: netdev-bot+sashiko@kernel.org
+To: vulab@iscas.ac.cn
+Cc: stefan@datenfreihafen.org, alex.aring@gmail.com, miquel.raynal@bootlin.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@kernel.org,
+ kuba@kernel.org, pabeni@redhat.com, linux-wpan@vger.kernel.org,
+ netdev@vger.kernel.org
+Date: Sun, 08 Nov 2026 02:30:22 +0000
+Message-ID: <179410502269.994134.4476899141931304112@kernel.org>
+In-Reply-To: <20261104021458.1468481-1-vulab@iscas.ac.cn>
+References: <20261104021458.1468481-1-vulab@iscas.ac.cn>
+X-sashiko-severity: High
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Post: <mailto:linux-wpan@vger.kernel.org>
@@ -60,151 +64,218 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-wpan+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature"; micalg=pgp-sha256; boundary="------42251045ef49eb2e1d58e9bb17ea4dbe21ddf3576aebf534060aa7cabb773e01"; charset=utf-8
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------42251045ef49eb2e1d58e9bb17ea4dbe21ddf3576aebf534060aa7cabb773e01
-Content-Type: multipart/mixed;
- boundary=4bd63114661f58558a324b8e38d0f5b50f21cf001d258bdae6b10dac11c0
-From: Ryan Prinz <rc4d5a@protonmail.com>
-To: linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	Ryan Prinz <rc4d5a@protonmail.com>
-Subject: [PATCH] ieee802154: 6lowpan: validate fragment offset against datagram size
-Date: Sat,  7 Nov 2026 23:32:17 +0100
-Message-ID: <20261107223217.718177-1-rc4d5a@protonmail.com>
-X-Mailer: git-send-email 2.56.0
-MIME-Version: 1.0
+Thank you for your contribution! Sashiko AI review found 1 potential
+issue(s) to consider.
 
---4bd63114661f58558a324b8e38d0f5b50f21cf001d258bdae6b10dac11c0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Critical: 0 · High: 1 (2) · Medium: 0 · Low: 0
 
-A 6LoWPAN fragment announces the total size of the datagram it belongs
-to (d_size) and its own offset within that datagram. The reassembly
-code never checks that the offset actually fits inside d_size, so a
-fragment claiming to start far past the end of the datagram is
-accepted the same as a legitimate one, allowing an attacker to forge
-data of another sender.
+If you believe none of the issues are legitimate, please reply to each
+issue of Medium severity or higher and explain why the AI is wrong.
+If any of them are legitimate and you plan to respin, please let patchwork
+know by including "pw-bot: cr" as a separate line at the end of your reply
+(one such reply per series is enough).
 
-lowpan_frag_queue() considers a datagram complete by counting bytes
-received (fq->q.meat) against the declared size (fq->q.len), not by
-verifying the bytes form a contiguous range. A fragment with an
-out-of-range offset still has its length counted toward that total, so
-a legitimate fragment exchange plus an attacker fragment can sum to
-d_size, marking the datagram complete while a gap in the data was
-never filled, and appending the out-of-range fragment's bytes to the
-end of the reassembled buffer as if they were part of the message.
+- [High] The fix is incomplete, and the commit message describes the bug
+  wrongly.
 
-IPv6's reassembly (net/ipv6/reassembly.c, ip6_frag_queue()) computes
-end = of
-fset + payload length for every fragment and checks end
-against IPV6_MAXPLEN, which bounds offset by construction. 6LoWPAN's
-d_offset and d_size are independent wire fields with no such coupling,
-and no separate bounds check was added for it.
+Pre-existing issues:
+- [High] This problem wasn't introduced by this patch, but
+  atusb_disconnect() (drivers/net/ieee802154/atusb.c) kills and frees…
+- [High] This problem wasn't introduced by this patch, but the lifetime
+  of the delayed work atusb->work (embedded in hw->priv) is guarded only…
 
-The same class of bug was assigned CVE-2019-8359 (CVSS 9.8) in
-Contiki-NG's 6LoWPAN stack before a 2019 fix; RIOT-OS's implementation
-(gnrc_sixlowpan_frag_rb_add) rejects a fragment once offset + size
-exceeds the reassembly buffer's datagram_size. Linux's 6LoWPAN
-reassembly is the only one of these implementations without an
-equivalent check.
-
-Fix by rejecting any fragment whose offset, or offset plus length,
-falls outside [0, d_size).
-
-Fixes: 7240cdec60b1 ("6lowpan: handling 6lowpan fragmentation via inet_frag api")
-Signed-off-by: Ryan Prinz <rc4d5a@protonmail.com>
----
-Reproduced two ways: with a local kernel module calling
-lowpan_frag_rcv() directly, and over mac802154_hwsim with three
-independent processes standing in for s
-ender, receiver and attacker.
-An attacker in radio range who observes one fragment of an
-in-progress transmission reads d_tag, d_size and the addressing in the
-clear, then sends a single out-of-range fragment of its own. The
-receiver's reassembly completes with the attacker's bytes appended to
-the legitimate data. Both reproducers were re-run against this fix to
-confirm the out-of-range fragment is now rejected and the datagram no
-longer completes with it included.
-
-AI Disclosure: An AI assistant (Claude) was used to assist with the
-analysis and testing. I have verified the vulnerability, the fix, and
-the test results myself and take responsibility for this contribution,
-per Documentation/process/coding-assistants.rst.
-
- net/ieee802154/6lowpan/reassembly.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/net/ieee802154/6lowpan/reassembly.c b/net/ieee802154/6lowpan/reassembly.c
-index ddb6a5817d09..905ba5f86844 100644
---- a/net/ieee802154/6lowpan/reassembly.c
-++
-+ b/net/ieee802154/6lowpan/reassembly.c
-@@ -103,6 +103,9 @@ static int lowpan_frag_queue(struct lowpan_frag_queue *fq,
- 	offset = lowpan_802154_cb(skb)->d_offset << 3;
- 	end = lowpan_802154_cb(skb)->d_size;
-
-+	if (offset > end || skb->len > end - offset)
-+		goto err;
-+
- 	/* Is this the final fragment? */
- 	if (offset + skb->len == end) {
- 		/* If we already have some bits beyond end
 --
-2.51.2
 
---4bd63114661f58558a324b8e38d0f5b50f21cf001d258bdae6b10dac11c0
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="publickey - rc4d5a@protonmail.com
- - 0xE775BF83.asc"; name="publickey - rc4d5a@protonmail.com -
- 0xE775BF83.asc"
-Content-Type: application/pgp-keys; filename="publickey -
- rc4d5a@protonmail.com - 0xE775BF83.asc"; name="publickey -
- rc4d5a@protonmail.com - 0xE775BF83.asc"
+ieee802154: atusb: drop the URB reference after a failed resubmit
 
-LS0tLS1CRUdJTiBQR1AgUFVCTElDIEtFWSBCTE9DSy0tLS0tCkNvbW1lbnQ6IGh0dHBzOi8vZ29w
-ZW5wZ3Aub3JnClZlcnNpb246IEdvcGVuUEdQIDIuMTAuMAoKeGpNRWFkRFpyUllKS3dZQkJBSGFS
-dzhCQVFkQTFpeGV6cng0ZTBFNWJGcjV6UU8xMitlb20vdWZnUVFTS05jQwpHU1ZjUzlqTkxYSmpO
-R1ExWVVCd2NtOTBiMjV0WVdsc0xtTnZiU0E4Y21NMFpEVmhRSEJ5YjNSdmJtMWhhV3d1ClkyOXRQ
-c0xBRVFRVEZnb0Fnd1dDYWREWnJRTUxDUWNKRUFVYktZOW5tekdRUlJRQUFBQUFBQndBSUhOaGJI
-UkEKYm05MFlYUnBiMjV6TG05d1pXNXdaM0JxY3k1dmNtY21EdVNNSm1tcTJWVDN2aFkzY0JzRDFS
-YUVsZGE2dDdpTwo1S21uZXZwYXhRTVZDZ2dFRmdBQ0FRSVpBUUtiQXdJZUFSWWhCT2QxdjRPUWRH
-ZGFobnFvR0FVYktZOW5tekdRCkFBQmFDUUVBdWxVaElDbmFPSU9DT1d4T3pldUNUZ0dUVGkxM1k4
-WjdVL3pYaER1bmFpa0EvaUJRRVBZOEx5NisKU2RZUnZzekQwcHBsS0M0elB2WkhqRDZaMEo4U2Ir
-RUh6amdFYWREWnJSSUtLd1lCQkFHWFZRRUZBUUVIUUNwbApBSFVLZXNpb25QaGlBVnBvL3dDUFdt
-MnR3SGtpL0tmaUpHQVdlckIxQXdFSUI4SytCQmdXQ2dCd0JZSnAwTm10CkNSQUZHeW1QWjVzeGtF
-VVVBQUFBQUFBY0FDQnpZV3gwUUc1dmRHRjBhVzl1Y3k1dmNHVnVjR2R3YW5NdWIzSm4KNlJuS0R5
-WjJlV1BjOSs3NEJIR3VPM1E1VGVuWFZ6bWRrRjQ3L1lYQUxFOENtd3dXSVFUbmRiK0RrSFJuV29a
-NgpxQmdGR3ltUFo1c3hrQUFBN1RzQS8zRy9hUE9NeGE2MDZxdlh2U3lUOURDNTJCa294ZmlNMk5N
-SFpHK0QwSnVGCkFQMFhXbGRlbEVvTFY1bWNRbXFIVThqMVp2ZzRtT1hWL2owYytPWmRheVhUQnc9
-PQo9VnZDNAotLS0tLUVORCBQR1AgUFVCTElDIEtFWSBCTE9DSy0tLS0t
---4bd63114661f58558a324b8e38d0f5b50f21cf001d258bdae6b10dac11c0--
+This patch adds a usb_free_urb() call to atusb_work_urbs(). The call runs
+after a failed atusb_submit_rx_urb() has put the URB back on the idle
+anchor. Its purpose is to drop the reference that usb_get_from_anchor()
+hands to the caller.
 
---------42251045ef49eb2e1d58e9bb17ea4dbe21ddf3576aebf534060aa7cabb773e01
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+> diff --git a/drivers/net/ieee802154/atusb.c b/drivers/net/ieee802154/atusb.c
+> index 5f7fc4ee7a071..c924f17171f46 100644
+> --- a/drivers/net/ieee802154/atusb.c
+> +++ b/drivers/net/ieee802154/atusb.c
+> @@ -183,6 +183,7 @@ static void atusb_work_urbs(struct work_struct *work)
+>  	} while (!ret);
+>  
+>  	usb_anchor_urb(urb, &atusb->idle_urbs);
+> +	usb_free_urb(urb);
 
------BEGIN PGP SIGNATURE-----
-Version: ProtonMail
+[Severity: High]
+Doesn't the reference from usb_get_from_anchor() also leak when
+atusb_submit_rx_urb() succeeds?
 
-wqsEARYIAF0FgmrvpxMJEAUbKY9nmzGQNRQAAAAAABwAEHNhbHRAbm90YXRp
-b25zLm9wZW5wZ3Bqcy5vcmdxxi8Ehs2A2U1MdsnVee88FiEE53W/g5B0Z1qG
-eqgYBRspj2ebMZAAABU9AP0c8mwebEUm16RNwWgRDmlSc70LDNN5ZgURV+cs
-UXk4ggD/fidd7LgZyjBfLEnkrVYLrXqdX0eE4eBe2/fAPuwo0AQ=
-=g7G9
------END PGP SIGNATURE-----
+The commit message says:
 
+    When atusb_submit_rx_urb() fails, that reference is not consumed,
 
---------42251045ef49eb2e1d58e9bb17ea4dbe21ddf3576aebf534060aa7cabb773e01--
+On success, atusb_submit_rx_urb() doesn't consume it either.
+usb_anchor_urb(urb, &atusb->rx_urbs) takes its own reference, and
+usb_hcd_submit_urb() takes another. The loop then fetches the next URB
+without dropping the caller's reference:
 
+	do {
+		urb = usb_get_from_anchor(&atusb->idle_urbs);
+		if (!urb)
+			return;
+		ret = atusb_submit_rx_urb(atusb, urb);
+	} while (!ret);
+
+The refcount through one successful RX cycle:
+
+  on idle_urbs                                   1
+  usb_get_from_anchor() (caller owns it)         1
+  usb_anchor_urb(urb, &atusb->rx_urbs)           2
+  usb_hcd_submit_urb()                           3
+  __usb_hcd_giveback_urb()->usb_unanchor_urb()   2
+  atusb_in()->usb_anchor_urb(idle_urbs)          3
+  __usb_hcd_giveback_urb()->usb_put_urb()        2
+
+So the URB goes back on idle_urbs with 2 references instead of 1, and
+each later successful cycle adds one more. atusb_in() reschedules the
+work for every received frame, so this is the normal RX path, not an
+error path.
+
+On disconnect, atusb_in() does not re-anchor URBs that were killed with
+-ENOENT, and atusb_free_urbs() drops only one reference per idle URB.
+Wouldn't every URB that was ever submitted successfully then leak on each
+disconnect or unbind?
+
+Would it be better to drop the reference after every
+atusb_submit_rx_urb() call, success or failure, re-anchoring to idle_urbs
+first on failure? carl9170_usb_submit_rx_urb() and btusb's play_deferred()
+both do this:
+
+	urb = usb_get_from_anchor(&ar->rx_pool);
+	if (urb) {
+		usb_anchor_urb(urb, &ar->rx_anch);
+		err = usb_submit_urb(urb, gfp);
+		if (unlikely(err)) {
+			usb_unanchor_urb(urb);
+			usb_anchor_urb(urb, &ar->rx_pool);
+		} else {
+			...
+		}
+		usb_free_urb(urb);
+	}
+
+That would replace the failure-only drop, and the commit message would
+need updating to match.
+
+>  	dev_warn_ratelimited(&usb_dev->dev,
+>  			     "atusb_in: can't allocate/submit URB (%d)\n", ret);
+>  	schedule_delayed_work(&atusb->work,
+
+[Severity: High]
+This isn't a bug introduced by this patch, but can atusb_xmit() use
+atusb->tx_urb after disconnect has freed it?
+
+atusb_disconnect() frees tx_urb before it unregisters the hw:
+
+drivers/net/ieee802154/atusb.c:atusb_disconnect() {
+    ...
+	usb_kill_urb(atusb->tx_urb);
+	usb_free_urb(atusb->tx_urb);
+
+	ieee802154_unregister_hw(atusb->hw);
+    ...
+}
+
+The wpan interface stays registered and up until
+ieee802154_unregister_hw()->ieee802154_remove_interfaces() runs. A frame
+sent in that window goes through:
+
+ieee802154_subif_start_xmit()
+  ieee802154_hot_tx()
+    ieee802154_tx()
+      drv_xmit_async()
+        atusb_xmit()
+
+None of these functions checks for teardown. atusb_xmit() then writes
+into the freed URB and submits it:
+
+	usb_fill_control_urb(atusb->tx_urb, usb_dev,
+			     usb_sndctrlpipe(usb_dev, 0),
+			     (unsigned char *)&atusb->tx_dr, skb->data,
+			     skb->len, atusb_xmit_complete, NULL);
+	ret = usb_submit_urb(atusb->tx_urb, GFP_ATOMIC);
+
+After a sysfs unbind the device is still attached, so the submit can
+succeed and the host controller works on freed memory.
+
+Should ieee802154_unregister_hw() be called before the URBs are killed
+and freed?
+
+[Severity: High]
+This is a pre-existing issue, but can atusb->work still be queued when
+ieee802154_free_hw() frees it?
+
+The delayed work is embedded in hw->priv. Its lifetime is guarded only by
+the plain atusb->shutdown flag, which is read without a lock, and by one
+cancel_delayed_work_sync() early in atusb_disconnect():
+
+	atusb->shutdown = 1;
+	cancel_delayed_work_sync(&atusb->work);
+
+	usb_kill_anchored_urbs(&atusb->rx_urbs);
+
+There seem to be three ways for the work to be queued after that cancel,
+or freed without ever being cancelled.
+
+First, atusb_in() checks the flag and then acts on it with nothing
+holding it stable:
+
+	usb_anchor_urb(urb, &atusb->idle_urbs);
+	if (!atusb->shutdown)
+		schedule_delayed_work(&atusb->work, 0);
+
+CPU1 (atusb_in)                 CPU2 (atusb_disconnect)
+reads shutdown == 0
+                                atusb->shutdown = 1;
+                                cancel_delayed_work_sync() (nothing queued)
+schedule_delayed_work()
+                                usb_kill_anchored_urbs(&atusb->rx_urbs)
+
+usb_kill_anchored_urbs() only waits for the completion handler to finish.
+It does not cancel the work that the handler queued.
+
+Second, atusb_start() queues the work without checking shutdown:
+
+drivers/net/ieee802154/atusb.c:atusb_start() {
+    ...
+	schedule_delayed_work(&atusb->work, 0);
+    ...
+}
+
+The netdev stays registered until ieee802154_unregister_hw(), which runs
+after the cancel. Bringing the interface up in that window queues work
+that nothing cancels, because atusb_stop() only kills idle_urbs.
+
+Third, the atusb_probe() error path that runs after
+ieee802154_register_hw() has succeeded:
+
+	ieee802154_unregister_hw(hw);
+fail:
+	atusb_free_urbs(atusb);
+	usb_kill_urb(atusb->tx_urb);
+	usb_free_urb(atusb->tx_urb);
+	ieee802154_free_hw(hw);
+
+Once register_hw has succeeded, userspace can bring wpan0 up. That runs
+atusb_start() and then the work, which submits RX URBs to rx_urbs. If the
+final atusb_get_and_clear_error() then fails, this path never calls
+cancel_delayed_work_sync() and never kills rx_urbs. The in-flight RX URBs
+hold skbs with SKB_ATUSB(skb) == atusb.
+
+Could the queued work, or those URB completions, then touch the freed
+atusb?
+
+Should the work be cancelled again after the last point that can queue
+it, and should rx_urbs be killed, on both the disconnect path and the
+probe error path?
+
+-- 
+Sashiko AI review · https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20261104021458.1468481-1-vulab%40iscas.ac.cn
