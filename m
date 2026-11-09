@@ -1,60 +1,109 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=109.224.244.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.177
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794215001;
-	b=Lc25KZXqlVXfm8iIZCRXxsOXuCKZjuLN1OTiTu023anUvjQ1VIO0vIk6pLdnKFlwNdvQ
-	 lazAxmSbzr3OxBX6DvGpTLtPK+avKObAB5fVqkpDqda5uEVC08K8yjXhWHTGKoMzZSrF2
-	 eHV2we1VAzCwWZFVH5HyaYLUdGRosc6nuXGeEdh33zNZqQ88UgTrpEx+xMy+gFB+cZByc
-	 mqzlalP7EcfzNqRKwUO6zFMyHCF948FJm2bFLXvUtpsXpx0Z4rXAT1na+Y/oQiSYvVIbk
-	 f7kPAI3XlDpepy+96oOUnyW1xOL8uaZUdvFV9cJskyy7vY5l7MfZ5PEzBSjDigNzi3A==
+	t=1794241317;
+	b=NT7Okpoera7w0dFVDaDtzvLcyYGX2p0+oSXlRsradzhG0ySEX3VIixMlviza5lB7Z+wi
+	 n47sm6G/YHwF2WuN7BVLM9xq5ZscyGsAWXw8aYBkdLI4A4ltgQefW/6H/U2tVOnhPPNvx
+	 dWbkjXfEHfrBQ7tveh1rdRZIT1G2pjzf9b3ZxMgCWT/FwV6Fpd3HqBf7yaISy3eBi8QXk
+	 D/lnK1KVf0DzUb6EciWXId/fslALnH0sYRBNRW5gbPqjvxZ4v86+mefP87SZ1m8YZ7zw3
+	 PGV4A+sSpUX1OjhnYdKoDEU/EN/spwbBYxzkybvEvUsp3x6BEq72LWa3gmzDnpdFW1g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794215001;
-	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
-	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=6cuy9kyGkv5P616P2ratiKJ2MJKg1l6yUfUk/flfg+Y=;
-	b=tBfbSbCBtqHRpGCGW4A4ktRcN5hfp1gMWRlUaFMMCwW2c0z6teTVIQF8x/mHddetKeo2
-	 isAhzHpnPop1wA0ulAk7VFn1ElnTpidhhrxB3Sw+VoOCpuRsxf3ASYYPpk3aWLVI3maSo
-	 ATO309jTAMavmLMnX2vXQCiyd+VOnNUzIEWExZa2iobcbFu7FnT5MFGtrCR52X4L1yhem
-	 gNjJ+IT1Nw5EkjyYZx/WRwI30MGohiJgPw6wGe7TL4vvMsepvGpwtwHsKI6fV1t98GaDB
-	 YBbdZBPKMzwlE6oWMTaelxg6hW/G8Xz6cIzWjlsUKFi2vvwEJ1saOw4Y4pNP79s4ljg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794241317;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding;
+	bh=BYPTkk/4BunQr6t7vq/ZOQ1XWuSd/WG5xS8ifOxf1Lo=;
+	b=WffglVdNcUqVqYuqKb5hUjFOuinvfIOorxpWLNrD/26qixjbculbx8BCBZKaZRiMSFRw
+	 zSneBNsaN4VDy/1aNNBH6e2XGnrkjNb/wsWipDjlxg91G/gVA5+kjL3raz2mfRKRJebvz
+	 3/uxMLlmfsf/RA5xQnZiAQPUnPrPa9PUk8ijohf1r5VGXNQDG2h81D/pgt7tj+oFgFp6f
+	 nMLC2Qb5eO+aLdwfaOe/id+Zf88cBIYacKi0CMWKmOjjcGYsCRDl0GrPVzbZ6XEDYNb6J
+	 jqpo+gV/1t0P09jj+r2q3Q5S1zcCbxQ7bfz6LyB/z9qE9ckbD3N9EYOEG80JFxSuUbg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=protonmail.com;
-	spf=pass smtp.mailfrom=protonmail.com;
-	dkim=pass header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b=xOTHkHoe;
-	arc=none smtp.remote-ip=109.224.244.18
-Received: from mail-24418.protonmail.ch (mail-24418.protonmail.ch [109.224.244.18])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b="fJs9VWZ/";
+	arc=none smtp.remote-ip=209.85.221.177
+Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFB67606A31C
-	for <linux-wpan@vger.kernel.org>; Mon,  9 Nov 2026 09:03:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org EFB67606A31C
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D048606A31C
+	for <linux-wpan@vger.kernel.org>; Mon,  9 Nov 2026 16:21:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 1D048606A31C
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b=xOTHkHoe
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1794214998; x=1794474198;
-	bh=6cuy9kyGkv5P616P2ratiKJ2MJKg1l6yUfUk/flfg+Y=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=xOTHkHoeRFFDN8seGQGWfTAtLlRfPjmHoR1YTEBqf7fSNTGXimpiL586fuyL1pJtn
-	 3JXPYAHtFq1SUxhTzkvUuersnLwOhTPaAcVuZ0PkIMhWS80428o7Hgu12tbp+stciy
-	 Pqgcc6Ic7Owsdx5BC0ZYgW9Bhm/x4SwFT1MBf9ATCepjGQg2n15+jZ2OxqPE2iG6sB
-	 5qCvL5YmX4TZZiCbWbxJVFlgjdpgniZSbFLuM95/bDrl3tfu4xIsrOr9l0geAqFGZD
-	 mpSIZwjNsGk473VPe+GebNrpoYnATP/FX1/10OE8WU8p3GKiFsTOtJURRb0QGsGwjN
-	 26eKCGjB87BJQ==
-Date: Mon, 09 Nov 2026 09:03:13 +0000
-To: linux-wpan@vger.kernel.org, netdev@vger.kernel.org
-From: Ryan Prinz <rc4d5a@protonmail.com>
-Cc: Alexander Aring <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, Miquel Raynal <miquel.raynal@bootlin.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org, Ryan Prinz <rc4d5a@protonmail.com>
-Subject: [PATCH net RESEND] ieee802154: 6lowpan: validate fragment offset against datagram size
-Message-ID: <20261109090226.799973-1-rc4d5a@protonmail.com>
-In-Reply-To: <20261107223217.718177-1-rc4d5a@protonmail.com>
-References: <20261107223217.718177-1-rc4d5a@protonmail.com>
-Feedback-ID: 190731814:user:proton
-X-Pm-Message-ID: bf0fda7c99a2d01a647628a08e521ef0853cdba0
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=fJs9VWZ/
+Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-5ee029fd76aso467829e0c.1
+        for <linux-wpan@vger.kernel.org>; Mon, 09 Nov 2026 08:21:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1794241316; x=1794846116; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-type:mime-version:subject
+         :references:in-reply-to:message-id:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to:content-type;
+        bh=BYPTkk/4BunQr6t7vq/ZOQ1XWuSd/WG5xS8ifOxf1Lo=;
+        b=fJs9VWZ/D6Zrq4tHCM/tTaabajQiokI5fKewOJzDRs5IS8KspKYj0dDdxANJBHdVMh
+         tdaqSjQLDlakszKo3L0QuF9bEIoXXlM3v+PhugbNXBaYEI4WhZFI+TFRZUeDRimiSA3l
+         fFMz/rzKb9ZY7w9xIIhsg0i/nuKM7mqi99g3h12a6cMWirwiauRWpPJzT12d/wbwtWX9
+         EavcRosymWl7MLB8U0uP6/tZW3EFQru6Ksn9gKBXYyKqRF0rLAUiomE/jQuR2YvdbJvz
+         pMpkI8SfZmNeD45z9ekErRNnLuJIiKV/Cp7IZD2h6ImavO05rvL5qjH7vY2lv6B4E8RV
+         9qIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794241316; x=1794846116;
+        h=content-transfer-encoding:content-type:mime-version:subject
+         :references:in-reply-to:message-id:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to
+         :content-type;
+        bh=BYPTkk/4BunQr6t7vq/ZOQ1XWuSd/WG5xS8ifOxf1Lo=;
+        b=v5FFCrHJwqIJjiYvwh0srKnH/AkMzHgowjEJ/Y2ud+0bxEZnc8HpoD6kn7uKPJQ4Lp
+         L38BPBhFiQC/DXvFNOtRhIwwncefeKsh4EfHS6lCtmcqHG35mNPjTiTkoEYxsguOBdjw
+         VC5FO3cRllVbFjduTHhl3PeLwDg+nsTieN4CtdyT+uCoLrL6MHEfu0yaeCsBkGUZ5MJS
+         tDQIO5oeGTFEBXaAD8xfBZQr6LlJWe9GXFaWlMWs2aUd26d0vqXWukslFfmJaJBAnSMH
+         YrqV3pA+L2SDvsAs99VSZ0K+8hIvZtw1jZoRS1/leQ0zz1c9AJye72B+72xYltBuGxi/
+         drmg==
+X-Forwarded-Encrypted: i=1; AL+hErGBAZW+rEMnOe5ciOAo/A7rxv6+Cl5DGfswaEZq83DUdxiqxbcx4135KEXkP9bbLbhuogvhQRDiMokI@vger.kernel.org
+X-Gm-Message-State: APuU4Z9X9JXudQ+5VkY9iuWlHaEQmU3V4zVK+/ftApjxZMoN6Sk1gzpN
+	qhd6JQyjLt5mrrLCSNJmBNlJ0r22JOKQ+77BuStllyOa3Z86aM2xeERNw+a5Bw==
+X-Gm-Gg: AYBFou2hgxJIJX6qdflyFVugBUp3gThNKUaY9HsOM/gJ2CDm3Xv6US4SRhe0qb0n7FI
+	vX123JCBd5xYn5gNVArNpWoncpyMLq8K6CenILRUj07b0IiLsoMfkIrNkDdQS6bRIjgy4na83Xg
+	qXqIZiCJFR89q+BmmN8DsowMxXuZa2IEYjZFVTg7SMtGNDfFcsSaeIW3bRZE+lUYLTJoEhF3meq
+	+Uou3rQCCztZcjiMt5Gcewst/X/a3XEa5NOjH9HdQImEtQcvPubGUt8vv5dpqiStMocDBGAKhaO
+	7upeCCcw5ryglsivV9YYwDfFY+NfBl7APGmADsHMTqgwCZEfR5+aub0Nco5attcE39VeUxDYiai
+	4nr4gmcjfw525vzTiRcnqOrTKpSbbMv4rJmlRaZF4sBaUMG9ZuK7IfVxQtTSc0ouO3/9YX0+BVK
+	Hxn1hMWP/4nhW8qzfDe5bbZ2PIZlqLpZVSROVG+dIOGmGN7EImNlHHgKlzdJzUW222IgChG8zqC
+	HLq0Nz/7wSGCyuqdqzP7Ti5Il44/jWk49viweMWixaH/u2IvTulqrAcgdayNUY3AOtM9SxXTR/9
+	zCYTWhztPFW4rgQibTxqTALqYR/cXNHR4XDRzKZGQ+/+OmHeP8SqS2yRc6FL0wzNnHXTx47UW8S
+	AsCEuQQwmxxah08O2TihvhTggvYHNNaKi1ESuPGMXkiDgA8dDhHhRK7QryMb0nO23vc6Vb5udhx
+	5ShauALt3L27xF9zP90A==
+X-Received: by 2002:a05:6122:4890:b0:5c9:c60e:3a48 with SMTP id 71dfb90a1353d-5ece735964cmr1685538e0c.20.1794241315788;
+        Mon, 09 Nov 2026 08:21:55 -0800 (PST)
+Received: from gmail.com (223.230.150.34.bc.googleusercontent.com. [34.150.230.223])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-99c1fffe12dsm21301241.5.2026.11.09.08.21.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Nov 2026 08:21:54 -0800 (PST)
+Date: Mon, 09 Nov 2026 11:21:54 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Kalpesh Solanki <skalpesh942@gmail.com>, 
+ willemdebruijn.kernel@gmail.com, 
+ jasowangio@gmail.com, 
+ alex.aring@gmail.com, 
+ stefan@datenfreihafen.org, 
+ miquel.raynal@bootlin.com, 
+ davem@davemloft.net, 
+ edumazet@kernel.org, 
+ kuba@kernel.org, 
+ pabeni@redhat.com
+Cc: andrew+netdev@lunn.ch, 
+ linux-wpan@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ syzbot+9ea34da5ca6100593c90@syzkaller.appspotmail.com, 
+ Kalpesh Solanki <skalpesh942@gmail.com>
+Message-ID: <willemdebruijn.kernel.4bc56403b78e@gmail.com>
+In-Reply-To: <20261109083037.22337-1-skalpesh942@gmail.com>
+References: <20261109083037.22337-1-skalpesh942@gmail.com>
+Subject: Re: [PATCH net v4] tun: disallow setting IEEE 802.15.4 and 6LoWPAN
+ link types via TUNSETLINK
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Post: <mailto:linux-wpan@vger.kernel.org>
@@ -64,82 +113,74 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-wpan+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-A 6LoWPAN fragment announces the total size of the datagram it belongs
-to (d_size) and its own offset within that datagram. The reassembly
-code never checks that the offset actually fits inside d_size, so a
-fragment claiming to start far past the end of the datagram is
-accepted the same as a legitimate one, allowing an attacker to forge
-data of another sender.
+Kalpesh Solanki wrote:
+> A userspace application can set the link type of a TUN/TAP interface
+> to ARPHRD_IEEE802154, ARPHRD_IEEE802154_MONITOR, or ARPHRD_6LOWPAN
+> via ioctl(fd, TUNSETLINK, arg) because tun_get_addr_len() explicitly
+> recognized these types.
+> 
+> However, TUN devices cannot function as genuine IEEE 802.15.4 or 6LoWPAN
+> interfaces:
+> 
+> 1. They lack wpan_phy, channels, PAN IDs, and MLME operations, and tun
+>    never initializes dev->ieee802154_ptr or dev->ml_priv. When an
+>    unprivileged user creates a TUN interface in a user+net namespace,
+>    changes its link type to ARPHRD_IEEE802154, and issues a netlink dump
+>    request (such as IEEE802154_LLSEC_LIST_KEY),
+>    ieee802154_llsec_dump_table() unconditionally dereferences
+>    dev->ieee802154_ptr / ieee802154_mlme_ops(dev), triggering a supervisor
+>    null-pointer dereference / general protection fault. Similar
+>    dereferences occur across net/ieee802154/nl-phy.c (ieee802154_del_iface)
+>    and net/ieee802154/socket.c.
+> 
+> 2. Similarly, the 6LoWPAN subsystem assumes via lowpan_dev(dev) that
+>    netdev_priv(dev) is struct lowpan_dev. On a TUN device, netdev_priv(dev)
+>    is struct tun_struct. On netdev events (such as NETDEV_DOWN in
+>    net/6lowpan/core.c:lowpan_device_event), it clears bits in
+>    lowpan_dev(dev)->ctx.table flags, which corrupts private memory inside
+>    tun_struct.
+> 
+> Rather than scattering checks across subsystems, fix the issue at the
+> source: disallow setting ARPHRD_IEEE802154, ARPHRD_IEEE802154_MONITOR, and
+> ARPHRD_6LOWPAN via TUNSETLINK by returning -EINVAL. Cast arg to unsigned
+> short in the comparison to prevent upper-bit truncation bypasses (e.g.
+> arg = ARPHRD_IEEE802154 | 0x10000).
+> 
+> Fixes: ff4cc3ac93e1 ("[TUNTAP]: Allow setting the linktype of the tap device from userspace")
+> Reported-by: syzbot+9ea34da5ca6100593c90@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=9ea34da5ca6100593c90
+> Signed-off-by: Kalpesh Solanki <skalpesh942@gmail.com>
 
-lowpan_frag_queue() considers a datagram complete by counting bytes
-received (fq->q.meat) against the declared size (fq->q.len), not by
-verifying the bytes form a contiguous range. A fragment with an
-out-of-range offset still has its length counted toward that total, so
-a legitimate fragment exchange plus an attacker fragment can sum to
-d_size, marking the datagram complete while a gap in the data was
-never filled, and appending the out-of-range fragment's bytes to the
-end of the reassembled buffer as if they were part of the message.
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-IPv6's reassembly (net/ipv6/reassembly.c, ip6_frag_queue()) computes
-end =3D offset + payload length for every fragment and checks end
-against IPV6_MAXPLEN, which bounds offset by construction. 6LoWPAN's
-d_offset and d_size are independent wire fields with no such coupling,
-and no separate bounds check was added for it.
+This may affect more protocols, and sashiko may surface that.
+That can always be a separate follow-up.
 
-The same class of bug was assigned CVE-2019-8359 (CVSS 9.8) in
-Contiki-NG's 6LoWPAN stack before a 2019 fix; RIOT-OS's implementation
-(gnrc_sixlowpan_frag_rb_add) rejects a fragment once offset + size
-exceeds the reassembly buffer's datagram_size. Linux's 6LoWPAN
-reassembly is the only one of these implementations without an
-equivalent check.
+> ---
+>  drivers/net/tun.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> index dcec7311e60..b50a7245be9 100644
+> --- a/drivers/net/tun.c
+> +++ b/drivers/net/tun.c
+> @@ -3362,6 +3362,10 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
+>  			netif_info(tun, drv, tun->dev,
+>  				   "Linktype set failed because interface is up\n");
+>  			ret = -EBUSY;
+> +		} else if ((unsigned short)arg == ARPHRD_IEEE802154 ||
+> +			   (unsigned short)arg == ARPHRD_IEEE802154_MONITOR ||
+> +			   (unsigned short)arg == ARPHRD_6LOWPAN) {
+> +			ret = -EINVAL;
+>  		} else {
+>  			ret = call_netdevice_notifiers(NETDEV_PRE_TYPE_CHANGE,
+>  						       tun->dev);
+> -- 
+> 2.53.0
+> 
 
-Fix by rejecting any fragment whose offset, or offset plus length,
-falls outside [0, d_size).
-
-Reproduced two ways: with a local kernel module calling
-lowpan_frag_rcv() directly, and over mac802154_hwsim with three
-independent processes standing in for sender, receiver and attacker.
-An attacker in radio range who observes one fragment of an
-in-progress transmission reads d_tag, d_size and the addressing in the
-clear, then sends a single out-of-range fragment of its own. The
-receiver's reassembly completes with the attacker's bytes appended to
-the legitimate data. Both reproducers were re-run against this fix to
-confirm the out-of-range fragment is now rejected and the datagram no
-longer completes with it included.
-
-AI Disclosure: An AI assistant (Claude) was used to assist with the
-analysis and testing. I have verified the vulnerability, the fix, and
-the test results myself and take responsibility for this contribution,
-per Documentation/process/coding-assistants.rst.
-
-Fixes: 7240cdec60b1 ("6lowpan: handling 6lowpan fragmentation via inet_frag=
- api")
-Signed-off-by: Ryan Prinz <rc4d5a@protonmail.com>
----
-Resending with correct tree designator in the subject
-
- net/ieee802154/6lowpan/reassembly.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/net/ieee802154/6lowpan/reassembly.c b/net/ieee802154/6lowpan/r=
-eassembly.c
-index ddb6a5817d09..905ba5f86844 100644
---- a/net/ieee802154/6lowpan/reassembly.c
-+++ b/net/ieee802154/6lowpan/reassembly.c
-@@ -103,6 +103,9 @@ static int lowpan_frag_queue(struct lowpan_frag_queue *=
-fq,
- =09offset =3D lowpan_802154_cb(skb)->d_offset << 3;
- =09end =3D lowpan_802154_cb(skb)->d_size;
-=20
-+=09if (offset > end || skb->len > end - offset)
-+=09=09goto err;
-+
- =09/* Is this the final fragment? */
- =09if (offset + skb->len =3D=3D end) {
- =09=09/* If we already have some bits beyond end
---=20
-2.51.2
 
