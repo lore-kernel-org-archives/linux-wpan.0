@@ -1,72 +1,63 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794845382;
-	b=0rNjzzTit3yW+NmLnN4JFuymur0jDY0z+zKD+KeKeu35rb1xRbH8azQcF81uo8+cYAoR
-	 4G6N1D1o+nV0bMae3Q3kGODDpBVs/M4SBL8D3ZZaJKtXGHbX+o1KeAcVEILj3kjqo2fDm
-	 HBZstpiPT2EeKTSbaSQL6Vn6N5TkZt9wEX61A3pacu/l9gUYYVKlNaqNwVZ+Vlal/UN5B
-	 x+EKTHNpbCegWgczLERhnmW5No49YS8mizoLAcdM2qoJEBCM2cBusoMIV89FPJLEKkDy4
-	 VpF0QQvPiw1GV1y16aVuPqT3806L3NMU837AGOA+k+XKs44Zgwse1MfNWKIIjdfdKoA==
+	t=1794867075;
+	b=w/tskF0VgosrUmEeB61h3zOG7rKxhLnSK53aU8NOvhzZKbQjfITosJ0YH6KhXKBv7Pg8
+	 51d1msTMq1GMkh/Eop3w2Pw5DSXn/B/nfkMSbLxFrUJTxvt2/E2DIMHQkZQpOCov8DdjC
+	 ZVKR5+xUiU17lSOeYqrpl/eaRh5q9MF2DBPaiaaTJG7gsbQoEVwUH8zHfw5uYnmIE6k4x
+	 Unpv/g+aQc6GBBPNR3bqEZjWMY3aJjULoIiw73vsd0yaRJ3JFZ/sci5iTZYlino8g/VZ7
+	 R6dh0TgKddsDfcsxgrcLlQuttxUaWytAXkt0SZkN/fzGT6w0hGXRrQIG3jcnRPo4JmA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794845382;
-	h=DMARC-Filter:Received:Received:Received:DKIM-Signature:From:To:Cc:
-	 Subject:In-Reply-To:References:User-Agent:Date:Message-ID:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:
-	 X-Last-TLS-Session-Version;
-	bh=k442VjNAgTRK01arDxCo74sZ/IUCWSOvu/yQtHpOYbc=;
-	b=ccII+SOaMA42pSPC/oJd+6r6ZBXtm5M1vwBnVxqdDu5jjX+r0f/eQroHgeY/x+vqqXNQ
-	 FDMH+rFrFmnremRwBpcT9jei9VGLHm3zZFyPP+NnVlbI9zodxoGjp1Inu76si5N5oZgoc
-	 Io+WBllHVodD1yO40h6ixWBJty/oY+AqlybeAilQizhHvpVyrLuClH38BgNZi5rLjkvfs
-	 YwaGac4qJg4Zjjl7araWPg4vwUghr7XWi7CGTi/bxKN5snLeFHw1NvA9n003JKQDmDdRE
-	 LkgFPsLSIfg71TUzaZof+pSGXczaHACCNeGGZv+H+hkCNZsShJwNSTaRR0QAAGDnIOA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794867075;
+	h=Received:DKIM-Signature:Date:From:To:Cc:Subject:Message-ID:
+	 In-Reply-To:References:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=KKsyFJuqb+jISh2VkJXDkgzTB/VIC5Qsn4SZG7ZDQkY=;
+	b=DAI4T25fKh73IsNjW/w9BI9K5obatiBHR6atuUTgjd/dgXSshLnEhbjFBjp7ETnL6Kx0
+	 puJgW5G0huATUos3QA0pht24qGCSBG89BgGTTPQkFGbbTxwUweO01Ae+5YbAlbwojNCsd
+	 FQ/W6efhR8GLkh2xb+RtikQenLYzbXwD1OybOyFno/ZBFktzSXBo0CprO/jWQbnVeviAR
+	 aG7Jb31cB8vfKpJIc56BP2/eROEqxT7aoHHFJHy0tdfuunJPxg9z404LY109BfnkB5bMZ
+	 aRwU3C7ioUm3BWCd2tG6caOFlz7fc8hdcD+4jDhfTB+4Py/ph6LECj4oEqfgELYybkw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=bootlin.com;
-	spf=pass smtp.mailfrom=bootlin.com;
-	dkim=pass header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=k7lMJ6+7;
-	arc=none smtp.remote-ip=185.171.202.116
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b="k089xL/f";
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34878606A322;
-	Mon, 16 Nov 2026 16:09:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 34878606A322
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2DCC606A329;
+	Mon, 16 Nov 2026 22:11:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=k7lMJ6+7
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 77582C4EFDB;
-	Mon, 16 Nov 2026 16:09:43 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 662156023F;
-	Mon, 16 Nov 2026 16:09:39 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 40CFC11BC146D;
-	Mon, 16 Nov 2026 17:09:32 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1794845378; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=k442VjNAgTRK01arDxCo74sZ/IUCWSOvu/yQtHpOYbc=;
-	b=k7lMJ6+7AhYnaYvY82R1DvzIhN4zHmQZ3VDVTttNGtJH6ANkEgdXIeR1CpN2CEF2hoYXJy
-	sL7WhLKofJrdr5cqC6aR97+94ECZx7wWLy9K7/RngBU+a/rU1zi4zeCBJ0UdfIG96koqh+
-	kx38y8XL9kChVFjozBShYbJ97bDsqa1uJmb73Budvya7HQuReuDP9kIZl4oT0TbNYUb/58
-	Bqt/6Wqtyxq53eQq1A85Ys6bev1mPbsN+efZBx34RZ8v81hNeK2e6e8jGVhA5nGgOpPtXx
-	wqUYOSNjZ7kseNdDddogbsIdHRqTasD5U4FWramVuOzx/irq2vmBmQQW8Qd+9Q==
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Yifan Zhang <yfzhang23@stu.pku.edu.cn>
-Cc: linux-wpan@vger.kernel.org,  netdev@vger.kernel.org,
-  alex.aring@gmail.com,  stefan@datenfreihafen.org,  davem@davemloft.net,
-  edumazet@kernel.org,  kuba@kernel.org,  pabeni@redhat.com,
-  horms@kernel.org,  zihanx@nebusec.ai,  stable@vger.kernel.org,
-  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v3] mac802154: validate pinned interface before
- beacon transmission
-In-Reply-To: <179378621331.55520.8126896786309171541@stu.pku.edu.cn> (Yifan
-	Zhang's message of "Wed, 04 Nov 2026 17:56:53 +0800")
-References: <179337523079.51423.6573078122047317758@stu.pku.edu.cn>
-	<179378621331.55520.8126896786309171541@stu.pku.edu.cn>
-User-Agent: mu4e 1.12.12; emacs 30.2
-Date: Mon, 16 Nov 2026 17:09:32 +0100
-Message-ID: <87y0aspxkz.fsf@bootlin.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=k089xL/f
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CB731F000C4;
+	Mon, 16 Nov 2026 22:11:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1794867075;
+	bh=KKsyFJuqb+jISh2VkJXDkgzTB/VIC5Qsn4SZG7ZDQkY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References;
+	b=k089xL/f9iDB1bzo+tkp70lRXNwq+ZquZv6//dnWh9RkRIqBx6mndNSMGVW1zsqnk
+	 +JAah8xj60i7EX/twVc8XFTBGlfxzsiJTNrJqQI0MBYRP8/3cnI+/UcTrGLz6IVH4t
+	 VrQWKxz5o73nY+rHVpFJjY+HQMSb903BUs94mHewRlsXGpv0eCyqKEafQ4+jGjfQpR
+	 K2VI+m+ydN9/+RwHCuqS4xBvaZjkyqMfM33rqxDz3hT07LmtvsvUY0+L2lxytX13xG
+	 5aUEDe0ejku8GtH95C2kvr91WWO7P+4gzkZ2l5MNCSE4ID1R79B3rQJ+ioLZ+wtbNi
+	 jI4un55/yhoWw==
+Date: Mon, 16 Nov 2026 14:11:14 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Miquel Raynal <miquel.raynal@bootlin.com>
+Cc: Aryan Arora <aryanarora.w1@gmail.com>, Alexander Aring
+ <alex.aring@gmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>, "David
+ S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, David
+ Girault <david.girault@qorvo.com>, linux-wpan@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzbot+19cbce4cc656ecd4febc@syzkaller.appspotmail.com
+Subject: Re: [PATCH] mac802154: Cancel scan work synchronously during
+ hardware teardown
+Message-ID: <20261116141114.30ead071@kernel.org>
+In-Reply-To: <87a4n8rczw.fsf@bootlin.com>
+References: <20261012120934.64632-1-aryanarora.w1@gmail.com>
+	<87v77626rq.fsf@bootlin.com>
+	<20261019190736.33bc37e6@kernel.org>
+	<87a4n8rczw.fsf@bootlin.com>
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Post: <mailto:linux-wpan@vger.kernel.org>
@@ -76,90 +67,22 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-wpan+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi,
+On Mon, 16 Nov 2026 16:51:15 +0100 Miquel Raynal wrote:
+> I believe the flow that works best is if you (net maintainers)
+> "continue" applying the patches directly, especially since these days
+> there are only AI bug fixes. We can definitely re-instate a formal
+> pull-request relationship between us as soon as there are new "features"
+> being discussed. We (wpan folks) will do our best to respond with timely
+> feedback/reviews.
 
-> Changes in v3:
-> - revalidate the request and pinned interface under RTNL
-> - serialize beacon template access with request replacement
-> - free the skb on every failure before the transmit-path handoff
+Alright, we have a lot of patches to handle so having more help
+(IOW having someone else handle the patches fully) would be preferable.
+But if you review in a timely fashion we can handle the manual labor
+parts.
 
-I think on this point we should have something a bit unified with the
-scan worker, because both handle similar situations. This is worth
-fixing in another patch.
-
-> --- a/net/mac802154/scan.c
-> +++ b/net/mac802154/scan.c
-> @@ -354,35 +354,31 @@ static int mac802154_transmit_beacon(struct ieee802=
-154_local *local,
->  				     struct wpan_dev *wpan_dev)
->  {
-
-...
-
-> +	rtnl_lock();
-> +	beacon_req =3D rtnl_dereference(local->beacon_req);
-> +	if (unlikely(!beacon_req || beacon_req->wpan_dev !=3D wpan_dev ||
-> +		     !ieee802154_sdata_running(sdata) ||
-> +		     !netif_running(sdata->dev))) {
-> +		ret =3D -ECANCELED;
-
-Since this is not an error, the caller should maybe not amit a log at
-the error level. Again, not worth a change in this patch, but would be a
-good follow-up.
-
-> +		goto out_free;
->  	}
->=20=20
-> -	sdata =3D IEEE802154_WPAN_DEV_TO_SUB_IF(beacon_req->wpan_dev);
-> +	/* Update the sequence number */
-> +	local->beacon.mhr.seq =3D atomic_inc_return(&wpan_dev->bsn) & 0xFF;
->  	skb->dev =3D sdata->dev;
->=20=20
-> -	rcu_read_unlock();
-> -
->  	ret =3D ieee802154_beacon_push(skb, &local->beacon);
-> -	if (ret) {
-> -		kfree_skb(skb);
-> -		return ret;
-> -	}
-> +	if (ret)
-> +		goto out_free;
->=20=20
->  	/* Using the MLME transmission helper for sending beacons is a bit
->  	 * overkill because we do not really care about the final outcome.
-> @@ -402,7 +398,16 @@ static int mac802154_transmit_beacon(struct ieee8021=
-54_local *local,
->  	 * transmissions, wich anyway does not have a huge impact on the
->  	 * performances given the current design of the stack.
->  	 */
-> -	return ieee802154_mlme_tx(local, sdata, skb);
-> +	ret =3D ieee802154_mlme_tx_locked(local, sdata, skb);
-> +	rtnl_unlock();
-> +
-> +	return ret;
-> +
-> +out_free:
-> +	rtnl_unlock();
-> +	kfree_skb(skb);
-> +
-> +	return ret;
->  }
->=20=20
->  void mac802154_beacon_worker(struct work_struct *work)
-
-Again, not related to this patch, but existing issue: since you are
-fixing the beacon path that is very close to the scan path that has
-already been fixed, there may be a missing cancel_delayed_work_sync() in
-mac802154_stop_beacons_locked() (the timer may still be pending when the
-PHY is freed).
-
-So for me the patch is correct, but follow-ups are needed.
-
-Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
-
-Thanks,
-Miqu=C3=A8l
+FWIW you can use the "Maintainer" filter on this page to quickly
+https://netdev-ctrl.bots.linux.dev/suie.html?delegate=netdev
+find outstanding patches to your subsystem.
