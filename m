@@ -1,70 +1,102 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=54.204.34.130
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=209.85.221.44
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794577392;
-	b=4eLyepQf4juKM/NLyYLZu+bIHynEbHhdbQ2qAw8XRVcUwZBMZ96fi/Cc50TbFU/gwkxB
-	 9IVsNxRDNznGBSqGMK9ZQWsb8Q3ZlZdcpILM8Kre4n+lQBkXNpZRC+ZSlRu1xB2rpapLr
-	 FJWsoHBogZsBxoczeQSSF37T7Jng29EiGCx/86WfW823I1pwcJUu6oZf/mqgnF1HpHIvD
-	 8Y8pEdFxRaKZ+xX40+cHzQZfXqQtGbVbJjhJPtt9N+wmW22OsXGiNA8K7rdVCYgaCDMy8
-	 qMLqQVEUCvCTnGPPhUL/KVpqZ+wTk32EIi6phrxfQpW8RsULvXPJpDsmZsSJ4M1qW3Q==
+	t=1794811972;
+	b=auStABVOWGnTnR0QGsSWZ5UFQetJ8teYtKhVjrAFU+FTUKTMAN+Rakd03TU/8aDAEUKC
+	 RXbKWPx2lv214nsfs1Gmj0cenrrwjxBtiaoNlgBpZWurdXJ39DvNLNUsPeOJHZTCeIwGc
+	 Jwiq6Tq4dUE1jhE4noC1dU7Ts8Hg3CPQpk1dVrPGyLScD5gfIkh+Kc4x10raHGinao4wd
+	 V556D4Qs0YVwy/zn1Qg/vGi4xBMUG1t2OH+3QIxznNGHwq86m2UTIH+l4A49ZD8TaNmQR
+	 e/SD7LEk4sFkvp6dQSimOKzgobQlPvLGSKNKB0A39f6QaIda/0Q/C0P6xqNgN5bvXUA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794577392;
-	h=DMARC-Filter:DKIM-Signature:X-QQ-mid:X-QQ-Originating-IP:Received:
-	 X-QQ-SSF:X-QQ-GoodBg:X-BIZMAIL-ID:EX-QQ-RecipientCnt:From:To:Cc:
-	 Subject:Date:Message-ID:X-Mailer:MIME-Version:
-	 Content-Transfer-Encoding:X-QQ-SENDSIZE:Feedback-ID:X-QQ-XMAILINFO:
-	 X-QQ-XMRINFO:X-QQ-RECHKSPAM;
-	bh=3kcrlVRBobTRT8jOtREfiBLM6vTtQc7X6ndLPnK4qOc=;
-	b=aaecWaCZiiuvsGMjvGcGY8Ejgyxcj7BjzH50sZRgXzyHt3s5zSIYUHACyn/Ew/JJp8yL
-	 5JvI3vWbmyKZCWPs1wekiTfDcNKqbW4SLbwDbeYaW1VGuC6oitik9h4W7FcviUZCNMU6l
-	 OMgU2aK5pcvvlanuoLXDZPFIjKinaImIaHASL3UqXmvkc+0bxQKrJwKbxnhwD4bKwgIFH
-	 UwCtCG2c52r5/QYRjlCu3OfCPJdxEOAaSf0a3aHLFzvQAeBqa2uW9zjWlzwZg4DvqDuBZ
-	 pnmvSPM8SmMLLvNOHKnHi/5WG1ohLzkwdT4FwYOeaeryQLGcFhtrvdGuWoLOrYdmwIw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794811972;
+	h=DMARC-Filter:Received:DKIM-Signature:X-Google-DKIM-Signature:
+	 X-Forwarded-Encrypted:X-Gm-Message-State:X-Gm-Gg:X-Received:Received:
+	 From:To:Cc:Subject:Date:Message-ID:X-Mailer:MIME-Version:
+	 Content-Transfer-Encoding;
+	bh=cjhcJXXCSoPUURtlLlIneNXvDxbgE0VczhsVYg4OWeA=;
+	b=wwdiI1ZLFWjKjHLxKIXjZfZk3fPOtFjZdDtwQcn6TEBviWjk4jLqi2Cg2tO5HjVik1d7
+	 VSpOEMcSk4ZshDprNmoV8r9GjtSaWygh+Pt4MJ59OWf2mzHyvPjjVqPSFWB3KtWCI41Iz
+	 mfbVJ0saQFRb/LRMbpCdu4fntJA5glEhqOpVX6ZjATXYtgJ386ogH5SD5HSav76nj312N
+	 gkGAnT08ou85F7Ig74CNeLmd6VoeGsgaimQOTP8VhAz0T3EnClRmO24/7qPueExBij33a
+	 zW1lkLPHuyIh783aK/neCLz6TV+YjLQ+zmW3eTiHyLZPmM1kBQjk4ucLLAzN3jdDaAA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=uniontech.com;
-	spf=pass smtp.mailfrom=uniontech.com;
-	dkim=pass header.d=uniontech.com header.i=@uniontech.com header.a=rsa-sha256 header.s=onoh2408 header.b=cKkX2C9T;
-	arc=none smtp.remote-ip=54.204.34.130
-Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
-	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	dmarc=pass header.from=gmail.com;
+	spf=pass smtp.mailfrom=gmail.com;
+	dkim=pass header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=q3H+UGzl;
+	arc=none smtp.remote-ip=209.85.221.44
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69324606A327;
-	Fri, 13 Nov 2026 13:43:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 69324606A327
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AD59606A332
+	for <linux-wpan@vger.kernel.org>; Mon, 16 Nov 2026 06:52:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 2AD59606A332
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key, unprotected) header.d=uniontech.com header.i=@uniontech.com header.a=rsa-sha256 header.s=onoh2408 header.b=cKkX2C9T
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1794577330;
-	bh=3kcrlVRBobTRT8jOtREfiBLM6vTtQc7X6ndLPnK4qOc=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=cKkX2C9TU/v7CMDu8ugevsUTc5a31S7buh2ror1VZhNiorOX6FXSVjxpppf7JpIOI
-	 grypYAyhUtU72O4aTG+Qe2pGBRWf8GnC3TKYnMe7+QWAWcHXZp5rE9Kox9jMBi6UBD
-	 T7FwdYUsE4487kmxajUaoXmD2tJ4bBMkjvbMoxiw=
-X-QQ-mid: zesmtpgz8t1794577305t88a9c797
-X-QQ-Originating-IP: UpGU27M314SgLzhWg8rwr6TRitp95Zs5/+Vkkk4Vmrk=
-Received: from uniontech.com ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 13 Nov 2026 21:41:43 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 2692691757360946475
-EX-QQ-RecipientCnt: 10
-From: Yichong Chen <chenyichong@uniontech.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.a=rsa-sha256 header.s=20260707 header.b=q3H+UGzl
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-48e10a70540so1626563f8f.1
+        for <linux-wpan@vger.kernel.org>; Sun, 15 Nov 2026 22:52:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20260707; t=1794811970; x=1795416770; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to:content-type;
+        bh=cjhcJXXCSoPUURtlLlIneNXvDxbgE0VczhsVYg4OWeA=;
+        b=q3H+UGzlRUdmWHbUPd7t3HR5eKwNDbaFWW84LlpilKC0Bmwf+p8Qj822BX83el6jq0
+         x97fSwmaPxrNovwx7gS79U6KbORn8lKnRVysFSFqxpm6Q0NWG5V0gm2gN025OB4hAx0U
+         MxQRjIpSJ9RYdqEbZ6nNKCuD0f4TA2h2nssetnqFFnQ3+uLZ/eByv1m5s1MQ4ZzJB1nn
+         27rKZDqHMauhvfY2iHIWBRxfdArVVwjBmh1AvkauVXRu3PzvtyPsuVHQkryoYcP2kVk8
+         ov5YzEupC6YOSRgvymDeHVgQ2vU59tY7GHqk6QOGNW78yk2qVvb6ytRx8gcL0rF0zsFR
+         VA5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20260707; t=1794811970; x=1795416770;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to:content-type;
+        bh=cjhcJXXCSoPUURtlLlIneNXvDxbgE0VczhsVYg4OWeA=;
+        b=Ud6s+sj3hV1u3YMGQhBcPo5qvIUO0yF+TTWUBlll0GbrFK5+orIAHlMxE3fJb2Oscu
+         ZQQySuo+CGF9o1nO2f0LqgcXg7VGWJje1WP7A/tLYkEWJsAUgQnTKQuRNIsSW0WLiPjc
+         NdvnDthAaLXU1ohrEEhNyM4SvBuVFa3PQuPSlpUU+528XFHNQKj4fSzLURbsXD55VjHf
+         3Mll3hNuIyyP/WV1FfmhW6KscCPj+yJ8tY7dGQB4pxS39YL7+xgnGbcK3n1MISGlquSs
+         iKpkImI8sZ/WsqblKVNatqD3Vk5zZrOGcE6eQRSeCgJI5ShypHGErDbAy5ZVg62mqR6J
+         L25w==
+X-Forwarded-Encrypted: i=1; AL+hErGxEu9av2Pbdm/HzHzS7cdxp77VmsPjLgZSNkvcNGtn6bkgOaDQfmkMJgg4+EimN45Jr4nFDyYmtWP2@vger.kernel.org
+X-Gm-Message-State: APuU4Z8vfK2ppE8P2eOYu4UmI3r0AUarEajgTxPZZzMibApzYMRoiArG
+	fn8Pt9xOmvAswvJXFAMEKvBe6hxDGaJiUtMZJoNiwFW1XLBHjFb5wSCw
+X-Gm-Gg: AYBFou0ZHsJ74ZoBS0Xj2ZCA6MuYcfzrZG7wsDVFIMCvOFYdVMHUFc6vsNs28WHnk/a
+	E8fAVNisq2xmHSZzaO1s9TWGbGadgq1ltOxRFYiDwDYeCahcuG84MgL4Tmrg8Kzcfd3ALvLt4i+
+	0rHBGGL5GjvQ4K35mFts9bf32D6dwWGOa4FbnZ/Ccwhwk3MIPdjFQvfdfMRxSl+um47qNUR5MVm
+	xhhKOgEYoiLEMdC//k05M3nzQrwTvTNU2kok4n5/jwPZL5/n83DnNmxG7O8Oe7B44MnhXOPPOol
+	Olv4dT8YOwxGanoUyD8y6zv5j0D6Egd7LfE0nW0sH3HoEopr0KlSveLtD4Z2lKt53YQPls+E60D
+	togiFkPoKt45V+YaAd9gf3BRkPXMiG/DMG9tmeO/2umUuxx55ZBbL9rNQ69s14buuRvxfFe4CP9
+	F3b+wKh9X3hv8V5OD/T/XBZfz0T9nUwP5FtY7IiIPWj8KFQzXwqiXlD+8TLeNFxCDdMhdq93XaQ
+	3e6UkGwwz1iLBUGw53GoTmjg9sD74BsqIQUgTZCs67iw+8a+/6+CkRneZDPkrX9atAqwQbcktyG
+	Du+p/h82R+Hd9PGJJ8vL
+X-Received: by 2002:a05:600c:8b4c:b0:4b7:6b96:e431 with SMTP id 5b1f17b1804b1-4bb55ab56ffmr208709665e9.28.1794811970223;
+        Sun, 15 Nov 2026 22:52:50 -0800 (PST)
+Received: from fedora ([5.131.7.59])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4bb6caae30csm86848945e9.2.2026.11.15.22.52.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 15 Nov 2026 22:52:49 -0800 (PST)
+From: Petr Vaganov <petrvaganoff@gmail.com>
 To: Alexander Aring <alex.aring@gmail.com>,
 	Stefan Schmidt <stefan@datenfreihafen.org>,
 	Miquel Raynal <miquel.raynal@bootlin.com>,
 	linux-wpan@vger.kernel.org
-Cc: netdev@vger.kernel.org,
+Cc: Petr Vaganov <petrvaganoff@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Phoebe Buckheister <phoebe.buckheister@itwm.fraunhofer.de>,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Zhan Jun <zhanjun@uniontech.com>,
-	syzbot+8a8482d4c33cc58babb4@syzkaller.appspotmail.com,
-	stable@vger.kernel.org,
-	Yichong Chen <chenyichong@uniontech.com>
-Subject: [PATCH net] ieee802154: hwsim: free PIB after hardware unregister
-Date: Fri, 13 Nov 2026 21:41:41 +0800
-Message-ID: <0D7C088B45E7283A+20261113134141.2626113-1-chenyichong@uniontech.com>
-X-Mailer: git-send-email 2.51.0
+	lvc-project@linuxtesting.org,
+	stable@vger.kernel.org
+Subject: [PATCH net] mac802154: remove redundant security_enabled assignment
+Date: Mon, 16 Nov 2026 13:52:34 +0700
+Message-ID: <20261116065235.27348-1-petrvaganoff@gmail.com>
+X-Mailer: git-send-email 2.55.0
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Post: <mailto:linux-wpan@vger.kernel.org>
@@ -75,75 +107,98 @@ List-Owner: <mailto:linux-wpan+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz3a-0
-X-QQ-XMAILINFO: OE2B1K8X9uN6TKRJknmgrzQ8Ba+/H4Q/PDI3pM1HiENumoaa+39xeTTP
-	Tb3HtFJN/ArQZA0ll4i+R4WEyv+c6UCgukuAk8Df64MNbytdWPzGcQUPvBwDpNTJbt60dcU
-	III9jEPFMPRX8i4v12nzJVqD45Jm6Orcl/xkko1a7n4LgMWUZ4Lo8I0lLFbnNt/YVk3mE2O
-	s/Acj07aTdfSmSvG3PnJo0gCwzZqJYb3kvLqvzVq6lhh1lV3F/VvddXutOyyb329czZg2hF
-	DJN+mZ28V/r/5lPnfswBad/GsJj9zxcnIXDla9xjHkBe8UHngaXQqZCzRMzNLFMxo1kxMnw
-	5DvXDUV8/wm3LeY/dRlHENfPuafH4BnYpnhsZSl1crSvwbz+P8rxjqSeuH9VZDHQXBHxRXI
-	4btkLfsxiVv4a3P3EfLHFb7Kos/LoA2Z+vPqI0RnJNyryyYCTBD4TVtUA4XTsG0zFfe8hXo
-	G/H7/4CAdxbVNNuVfj5bAPztQwparvcMq3NVfF7dfOaojHQK+C5V5QjsFtZGL9vxlntESpn
-	k8aphZgvGTFzkkq71RzItV5JXWfd6hty1IydJzPxVKHp2hvfE6oS1lD5EdnSkxgFOuQDiZ2
-	PjqV4PJz/lcOr9yHen/GZ4I5zD33mbHggQXBceteF13bS5/s36CQ7W6xp5lNa0Kszq9xOOJ
-	M7ZQCTDq25Ytx1OLx2XToAe4+QGWq44ijSUKincPQNlaQ3eiur+XUR2gD57WSNNOiY4oPkC
-	B49fVqrwqChZcy5iKc5JMFpVHakdMIFinx1pWB1hmpc6uCkKuJ2iZ2wNUFSdyiyGGY5jjFv
-	xyoiHZSEjW5ZuQ3IW7C/AdJVixecrZSH6MQ+UqvaAXpu9+Pw6VNqYZdJojN83QUGOoaB4ok
-	3BdjWjnsDZsNpgRvGRkvFhspAuHMtqLDgoHSq+U+7jdLjRnADdjBTvWVcuDDDs1DC+Hunm7
-	As5Sa7Z7p+Xv+jZ2H/c8hZ39SIgaNwWPzlLChPBne9uzkasqL9XddpgboT9dlTMG8/GI0g+
-	8ay/4x0XWcpbNc/i1Kl7oxzTZKYU+VsOkFvDslHd+IixAL02kg0PNKb6PXLASpmUlLcSpET
-	hM5gWN1QmPCddPvaq90oic=
-X-QQ-XMRINFO: NS+P29fieYNwqS3WCnRCOn9D1NpZuCnCRA==
-X-QQ-RECHKSPAM: 0
 
-From: Zhan Jun <zhanjun@uniontech.com>
+During fuzz testing, the following issue was discovered:
 
-hwsim_del() queued the current PIB for RCU freeing before calling
-ieee802154_unregister_hw(). Unregistering the hardware closes its
-interfaces and aborts an in-progress scan; scan cleanup calls
-set_channel(), which replaces the same phy->pib and queues the old object
-for RCU freeing again. KASAN then reports an invalid free in
-hwsim_update_pib().
+BUG: KMSAN: uninit-value in ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:54 [inline]
+BUG: KMSAN: uninit-value in ieee802154_hdr_push+0xa62/0xb20 net/ieee802154/header_ops.c:108
+ ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:54 [inline]
+ ieee802154_hdr_push+0xa62/0xb20 net/ieee802154/header_ops.c:108
+ ieee802154_header_create+0xa83/0xd20 net/mac802154/iface.c:396
+ wpan_dev_hard_header include/net/cfg802154.h:525 [inline]
+ dgram_sendmsg+0xc6d/0x15d0 net/ieee802154/socket.c:677
+ ieee802154_sock_sendmsg+0x8f/0xd0 net/ieee802154/socket.c:96
+ sock_sendmsg_nosec net/socket.c:711 [inline]
+ __sock_sendmsg+0x2f3/0x360 net/socket.c:726
+ ____sys_sendmsg+0x960/0xc30 net/socket.c:2581
+ ___sys_sendmsg+0x285/0x3e0 net/socket.c:2635
+ __sys_sendmmsg+0x33c/0x950 net/socket.c:2724
+ __do_sys_sendmmsg net/socket.c:2751 [inline]
+ __se_sys_sendmmsg net/socket.c:2748 [inline]
+ __x64_sys_sendmmsg+0xc6/0x150 net/socket.c:2748
+ x64_sys_call+0x12a8/0x3cf0 arch/x86/include/generated/asm/syscalls_64.h:308
+ do_syscall_x64 arch/x86/entry/common.c:47 [inline]
+ do_syscall_64+0xd9/0x1c0 arch/x86/entry/common.c:78
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Unregister the hardware first, then atomically detach the final PIB under
-pib_lock and queue only that current object for RCU freeing. This lets all
-driver callbacks finish before the PIB is reclaimed and avoids freeing a
-PIB that was already replaced during teardown.
+Uninit was stored to memory at:
+ ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:51 [inline]
+ ieee802154_hdr_push+0xa5b/0xb20 net/ieee802154/header_ops.c:108
+ ieee802154_header_create+0xa83/0xd20 net/mac802154/iface.c:396
+ wpan_dev_hard_header include/net/cfg802154.h:525 [inline]
+ dgram_sendmsg+0xc6d/0x15d0 net/ieee802154/socket.c:677
+ ieee802154_sock_sendmsg+0x8f/0xd0 net/ieee802154/socket.c:96
+ sock_sendmsg_nosec net/socket.c:711 [inline]
+ __sock_sendmsg+0x2f3/0x360 net/socket.c:726
+ ____sys_sendmsg+0x960/0xc30 net/socket.c:2581
+ ___sys_sendmsg+0x285/0x3e0 net/socket.c:2635
+ __sys_sendmmsg+0x33c/0x950 net/socket.c:2724
+ __do_sys_sendmmsg net/socket.c:2751 [inline]
+ __se_sys_sendmmsg net/socket.c:2748 [inline]
+ __x64_sys_sendmmsg+0xc6/0x150 net/socket.c:2748
+ x64_sys_call+0x12a8/0x3cf0 arch/x86/include/generated/asm/syscalls_64.h:308
+ do_syscall_x64 arch/x86/entry/common.c:47 [inline]
+ do_syscall_64+0xd9/0x1c0 arch/x86/entry/common.c:78
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Reported-by: syzbot+8a8482d4c33cc58babb4@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/6af5f575.b350cda4.2b6a63.0000.GAE@google.com/T/
-Fixes: f25da51fdc38 ("ieee802154: hwsim: add replacement for fakelb")
+Commit f30be4d53cad ("mac802154: integrate llsec with wpan devices")
+introduced mac802154_set_header_security() as the sole function
+responsible for enabling frame-level security: it sets both
+hdr->fc.security_enabled = 1 and initializes hdr->sec together,
+maintaining the invariant that security_enabled = 1 implies hdr->sec
+is initialized.
+
+However, ieee802154_header_create() was left with a pre-existing
+assignment:
+
+    hdr.fc.security_enabled = cb->secen;
+
+This assignment can set security_enabled = 1 (from a stale cb->secen)
+even when mac802154_set_header_security() returns 0 without initializing
+hdr.sec, violating that invariant. ieee802154_hdr_push_sechdr() then
+reads uninitialized hdr.sec fields.
+
+The stale value in cb->secen arises from a specific setsockopt()
+sequence: calling WPAN_SECURITY_ON (secen_override=1, secen=1) and
+then WPAN_SECURITY_DEFAULT (secen_override=0, secen unchanged at 1).
+This undocumented combination likely explains why the bug was rarely
+triggered.
+
+Remove the redundant assignment; mac802154_set_header_security() is the
+only correct place to set security_enabled.
+
+Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
+
+Closes: https://syzkaller.appspot.com/bug?extid=60a66d44892b66b56545
+Closes: https://syzkaller.appspot.com/bug?id=23f21e76e9d2d1ed587cb5e71515260d6d025b63
+Fixes: f30be4d53cad ("mac802154: integrate llsec with wpan devices")
 Cc: stable@vger.kernel.org
-Signed-off-by: Zhan Jun <zhanjun@uniontech.com>
-Signed-off-by: Yichong Chen <chenyichong@uniontech.com>
+Signed-off-by: Petr Vaganov <petrvaganoff@gmail.com>
 ---
- drivers/net/ieee802154/mac802154_hwsim.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ net/mac802154/iface.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/net/ieee802154/mac802154_hwsim.c b/drivers/net/ieee802154/mac802154_hwsim.c
-index a9bd1555d2dc..a65ae2afb789 100644
---- a/drivers/net/ieee802154/mac802154_hwsim.c
-+++ b/drivers/net/ieee802154/mac802154_hwsim.c
-@@ -1008,12 +1008,16 @@ static void hwsim_del(struct hwsim_phy *phy)
- 		list_del_rcu(&e->list);
- 		hwsim_free_edge(e);
- 	}
--	pib = rcu_dereference(phy->pib);
- 	rcu_read_unlock();
+diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+index f437b8daa00d..7b7332805ecc 100644
+--- a/net/mac802154/iface.c
++++ b/net/mac802154/iface.c
+@@ -368,7 +368,6 @@ static int ieee802154_header_create(struct sk_buff *skb,
  
-+	ieee802154_unregister_hw(phy->hw);
-+
-+	spin_lock_bh(&phy->pib_lock);
-+	pib = rcu_replace_pointer(phy->pib, NULL,
-+				  lockdep_is_held(&phy->pib_lock));
-+	spin_unlock_bh(&phy->pib_lock);
- 	kfree_rcu(pib, rcu);
- 
--	ieee802154_unregister_hw(phy->hw);
- 	ieee802154_free_hw(phy->hw);
- }
+ 	memset(&hdr.fc, 0, sizeof(hdr.fc));
+ 	hdr.fc.type = cb->type;
+-	hdr.fc.security_enabled = cb->secen;
+ 	hdr.fc.ack_request = cb->ackreq;
+ 	hdr.seq = atomic_inc_return(&dev->ieee802154_ptr->dsn) & 0xFF;
  
 -- 
-2.51.0
-
+2.55.0
