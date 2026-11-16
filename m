@@ -1,70 +1,68 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.246.84.56
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794841166;
-	b=G8neGMgSVwJLml/u+tstTPOv8NcqBxO6NPuXubVp0AUpKNzFbUjEvdzrv9LXxgZ2B1dn
-	 3sUAhh58Qd5muMMOlH98aRMslJ+EteI+y+E4U5CiUbqu81FDluEbFCujhDkrESVLtambl
-	 ZiVoBFPJprVn1lzdjXXFcHZvdDv0g6nFY8JYcKti1UDY6Te7KMVOR5ns3X9O0Q6RvcDVG
-	 h9mzP2L4vhPp420/24CHh3xVwjyXwifXSkFuKhnvNzSXShMJm6sxC4ra4pXYUtpIzlJRV
-	 8AomtbKdgUCssfnoedkdblVdW/Vbj7vLS9WVkQpnYmn9M6Qhn6Bwel9wZrKNCZGc8Mg==
+	t=1794841497;
+	b=gGl+S/rqLJYUcEBBFT+gCsw7IzwTzgZmJ0E5OmI/tmUj4lBISwt8pj0mMwZ/Wuedgmj5
+	 aog49l5ZPwEd5gGLPmiBzLeLFRocX/HmYrgPsVrZFkfNL6K7GINtSh7ollSTasnxQe3y/
+	 nNvjyuoz5yWD4zhPyJDVyTNnlFHHmWThCQdGjRiqA+cundWqLcRFmnA1RcKkCpHN3TW+q
+	 u9v7QbiniAV7kt7Bmxr4g0QstNFhFyJgeOMLRocHlZyA2BGU2aVSAj7/FqF74apJgVypj
+	 r4DRIAkA2s8tY9F3UvE+a7Yv0i9ZJ+a1NNJVPNrPPPh416UC24LKRyZBDxhQQGB0B6Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794841166;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794841497;
 	h=DMARC-Filter:Received:Received:Received:DKIM-Signature:From:To:Cc:
 	 Subject:In-Reply-To:References:User-Agent:Date:Message-ID:
 	 MIME-Version:Content-Type:X-Last-TLS-Session-Version;
-	bh=k+z1e8ZYHmpUCjSLI93JX1rRkKOX03qgDSkkP9m7sJM=;
-	b=sLaC4qEelbDdTSzqkOskt0sUuRCfErsP9s1QgAQ3LcAdp1qwMOboaS1rcsv7RPvKnaI7
-	 kcP5TObG6EU0wCKCAtAvKotTSqL1Qt0hGGe3WK9hnqcUcRgDolkp9/+KybjRUU7tr0hzP
-	 uKmz7bqKtVd/PluzAWTagoNHosKxbUVopJhzr0W1y7H38ut8EsgotQT2ug67v83Z5jSSc
-	 x2iEQ42vpaPhW4DuDPOmOSbjkkLR6UKxbiV2T8FYNvKYpBljZ7henYQ1MztV5Oec/zdUJ
-	 hGwbl1z3Kn+yOTsfasyjWmUu4qbmeUGgl56SQq4eizRxmNhWUZqo07L7QgxPT0SUY9Q==
+	bh=hS2mlsRX7vR2gya912wSbaDcuwZlM7TZjUS9hCdfuB8=;
+	b=sPXQ76xhyD+Sk28pePlRjqZr6QpINHErKSRJypLP2AT7awRmJKCi9wWP4mZ9ixCaAhzL
+	 I0P3KUwgTNMlRMFcbPtESlieztAVKWnSZNPAKJrULM2QSroKEH/3uuXjHj2G5H+7O0WHa
+	 qRcDyuuJqHPFMgVJNgR4RuTThV9EP4J/E+VVl8wSVc6HuHMIO+/Pazwpcck5DJWB0DVHD
+	 nzCIMEj/jtAglaxa7y61HiaoxfYb0EdPf9K7UICeQ3mYD6NKG6rwhTB2VbnNcEm6VLlX9
+	 4O3FA7iV0M+ibj/829W1yifW7da4laOJm0WG7s3aMrSmxwsqpHsf+PyQ1odgYaXQ3ZQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=bootlin.com;
 	spf=pass smtp.mailfrom=bootlin.com;
-	dkim=pass header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=b7dwUYkY;
+	dkim=pass header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=UW27Knme;
 	arc=none smtp.remote-ip=185.246.84.56
 Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB79606A329;
-	Mon, 16 Nov 2026 14:59:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8AB79606A329
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C04F3606A896
+	for <linux-wpan@vger.kernel.org>; Mon, 16 Nov 2026 15:04:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org C04F3606A896
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=b7dwUYkY
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=UW27Knme
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 073451A168A;
-	Mon, 16 Nov 2026 14:59:24 +0000 (UTC)
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 38BE21A1688;
+	Mon, 16 Nov 2026 15:04:50 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id CE9F86023F;
-	Mon, 16 Nov 2026 14:59:23 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7B7E611BC146D;
-	Mon, 16 Nov 2026 15:59:18 +0100 (CET)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 0B6756023F;
+	Mon, 16 Nov 2026 15:04:50 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3D40511BC146D;
+	Mon, 16 Nov 2026 16:04:42 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1794841162; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=k+z1e8ZYHmpUCjSLI93JX1rRkKOX03qgDSkkP9m7sJM=;
-	b=b7dwUYkYBncloh3qf///PWv/FCi82wnJRMnDsiFy6tRyanBxT+0HFmm/Vlr0JJpHuBBvz4
-	X3Gyqd5Or/le63nZuammyJqDBqmZuxdufszUfHFHGDjEPDI4Xjy0NslQiDmfKr0XWcdZmN
-	x8SEbMWNRls/gJnQTF1zpN8hmYzsE+htWV+/FCVpZC7io56+cOrr75yNLKWfwOFU3r0Un8
-	My8OC73w5GOHgHYcfVuKgPn1uWwGS+gD77+WiVrd1NbCUW8nJ7HauPvXFc2Z1QQ+Ifwb+6
-	wIBOgS+FDEcTCssTR+BsRsV364Mwu0sIf9ebrzkLtOkXfKVxE5WHxktrznAEAg==
+	t=1794841485; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=hS2mlsRX7vR2gya912wSbaDcuwZlM7TZjUS9hCdfuB8=;
+	b=UW27KnmejuONG95BDLRyME8YoHfOW6pnHBw5A+/7MXd2VVOGymGXkqPPJQdhyGnvTuvN5T
+	wsvCEg8qSWSuV7EJBwha3C5rkuOnMnEVrHV1HnHpUeS0GDLOJlyXRsj7v/lPd2CzcCxOYS
+	VfY3QEDuN0oC/8VGR2wmNVtXvoy2jO6rfx/zVEYKsGzbuW55BtQ7inOoMEXa0OISWyb4Og
+	IbmlpEr9pLxnRjmeAiJLqapoaS+mN6BVj2+D+Cr1sYRncD7Nk1y5N1Qli6G1vIMUhJ1Ik7
+	RXgwR5+YI4S0Ogh9TMp0CqEoRJrcdxYEiYIDhSWLxAgNaZko/ixQJU5KogmAEg==
 From: Miquel Raynal <miquel.raynal@bootlin.com>
 To: Wentao Liang <vulab@iscas.ac.cn>
 Cc: Alexander Aring <alex.aring@gmail.com>,  Stefan Schmidt
- <stefan@datenfreihafen.org>,  Andrew Lunn <andrew+netdev@lunn.ch>,  "David
- S. Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@kernel.org>,
-  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
-  linux-wpan@vger.kernel.org,  netdev@vger.kernel.org,
-  linux-kernel@vger.kernel.org,  stable@vger.kernel.org
-Subject: Re: [PATCH] ieee802154: fakelb: release platform device if driver
- registration fails
-In-Reply-To: <20261103102854.1340581-1-vulab@iscas.ac.cn> (Wentao Liang's
-	message of "Tue, 3 Nov 2026 10:28:54 +0000")
-References: <20261103102854.1340581-1-vulab@iscas.ac.cn>
+ <stefan@datenfreihafen.org>,  "David S. Miller" <davem@davemloft.net>,
+  Eric Dumazet <edumazet@kernel.org>,  Jakub Kicinski <kuba@kernel.org>,
+  Paolo Abeni <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,
+  linux-wpan@vger.kernel.org,  netdev@vger.kernel.org
+Subject: Re: [PATCH] ieee802154: drop the extra phy reference in del_iface
+In-Reply-To: <20261104022809.1484165-1-vulab@iscas.ac.cn> (Wentao Liang's
+	message of "Wed, 4 Nov 2026 02:28:09 +0000")
+References: <20261104022809.1484165-1-vulab@iscas.ac.cn>
 User-Agent: mu4e 1.12.12; emacs 30.2
-Date: Mon, 16 Nov 2026 15:59:17 +0100
-Message-ID: <87qzgkrfei.fsf@bootlin.com>
+Date: Mon, 16 Nov 2026 16:04:42 +0100
+Message-ID: <87ld6srf5h.fsf@bootlin.com>
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Post: <mailto:linux-wpan@vger.kernel.org>
@@ -77,23 +75,22 @@ MIME-Version: 1.0
 Content-Type: text/plain
 X-Last-TLS-Session-Version: TLSv1.3
 
-On 03/11/2026 at 10:28:54 GMT, Wentao Liang <vulab@iscas.ac.cn> wrote:
+On 04/11/2026 at 02:28:09 GMT, Wentao Liang <vulab@iscas.ac.cn> wrote:
 
-> fakelb_init_module() registers a platform device and then registers the
-> platform driver, returning the result of the latter directly. If driver
-> registration fails, module initialization fails and the module exit
-> function is never run, so the platform device is never unregistered and
-> leaks.
+> ieee802154_del_iface() takes a reference on the phy of the interface and
+> then looks up the phy named by IEEE802154_ATTR_PHY_NAME, which takes
+> another reference. When the optional attribute names the phy of the
+> interface being deleted, phy and phy2 are the same device, the lookup
+> reference is not dropped and the function later puts the phy only once.
+> Deleting an interface while passing its own phy name therefore leaks a
+> wpan_phy reference.
 >
-> Check the result of platform_driver_register() and unregister the device
-> on failure. Also check the device registration result, which can be an
-> ERR_PTR, before using the stored pointer.
+> Put the lookup reference in the matching case as well, leaving only the
+> reference taken from the interface.
 >
-> Fixes: e1e49b641387 ("drivers/ieee802154: IEEE 802.15.4 loopback driver")
+> Fixes: bb1cafb8fc41 ("ieee802154: add support for creation/removal of logic interfaces")
 > Cc: stable@vger.kernel.org
 > Assisted-by: DeepSeek-V4.1-Flash and OpenAI Codex
 > Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
-
-I don't think it is super useful, but it's not wrong either.
 
 Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
