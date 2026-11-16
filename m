@@ -1,74 +1,70 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.246.84.56
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794839854;
-	b=JJbdyMxcubaBMiQb8EpJdys2GnJtWvwiAG/JkFfCY+GNMS91Ueyl5lvXZ5zi705CetiO
-	 4Cw9Bl12o66BEUEvRLikxSDrIo1d5zyFoMoRaHO3+vGPWdFc1vpYhNfSZOAKyTyUd/Afa
-	 x5cztMQz26441QhsyOPtBF0Jdmj2EqlWCZ5DP3rBbxahjOBnmxNBFknYFJqzcnQ+IFi9a
-	 TlPK167i920jK+GEm51c2h/KMsxcLK1NoBgu3l8EKK53UsOtQTtLxFNqjMBeM9uQVKdd1
-	 pfw9hZjKPUqqfIr3um/zYO8vGTR8Izx+pylf4XtlJgmJp4G55Asi4KD79CZEh8zZ7SQ==
+	t=1794841166;
+	b=G8neGMgSVwJLml/u+tstTPOv8NcqBxO6NPuXubVp0AUpKNzFbUjEvdzrv9LXxgZ2B1dn
+	 3sUAhh58Qd5muMMOlH98aRMslJ+EteI+y+E4U5CiUbqu81FDluEbFCujhDkrESVLtambl
+	 ZiVoBFPJprVn1lzdjXXFcHZvdDv0g6nFY8JYcKti1UDY6Te7KMVOR5ns3X9O0Q6RvcDVG
+	 h9mzP2L4vhPp420/24CHh3xVwjyXwifXSkFuKhnvNzSXShMJm6sxC4ra4pXYUtpIzlJRV
+	 8AomtbKdgUCssfnoedkdblVdW/Vbj7vLS9WVkQpnYmn9M6Qhn6Bwel9wZrKNCZGc8Mg==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794839854;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794841166;
 	h=DMARC-Filter:Received:Received:Received:DKIM-Signature:From:To:Cc:
 	 Subject:In-Reply-To:References:User-Agent:Date:Message-ID:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:
-	 X-Last-TLS-Session-Version;
-	bh=mJeLQgSQR6c585+OnRTLrz3aLLmsqMPrzGqWlEQ9tMU=;
-	b=DzOVySiGWgss8xzilXoB2zbN+uIAHCevsYnud9ao7o7XhzsjZpkyz1G94Pg2gENAK35T
-	 cYsKCSDvBkyaRC++JIhzZ+uBcaNO0E1rNJC8U0OWXdQB2LMksS6kEXVjhdRl+v8NHA/uF
-	 lLjpQpBoFql+MOV/lpBiq/k4g7wESq6kus5e1VE/J+9SH8IIO1R+xfB/DhPKD/Rysj8fQ
-	 ODKO8hJS0iYI9dCIFjoSAILH70s/C3sVL0O0heZrjuNFoMqTyKvBjIxZXKxJQqa3GhCDf
-	 zZD9AdfZONpxixHbqP3aiPMAfCyVokeQEU+OgQS54YqwcyxzrhfKy7lmBspG38r8BEA==
+	 MIME-Version:Content-Type:X-Last-TLS-Session-Version;
+	bh=k+z1e8ZYHmpUCjSLI93JX1rRkKOX03qgDSkkP9m7sJM=;
+	b=sLaC4qEelbDdTSzqkOskt0sUuRCfErsP9s1QgAQ3LcAdp1qwMOboaS1rcsv7RPvKnaI7
+	 kcP5TObG6EU0wCKCAtAvKotTSqL1Qt0hGGe3WK9hnqcUcRgDolkp9/+KybjRUU7tr0hzP
+	 uKmz7bqKtVd/PluzAWTagoNHosKxbUVopJhzr0W1y7H38ut8EsgotQT2ug67v83Z5jSSc
+	 x2iEQ42vpaPhW4DuDPOmOSbjkkLR6UKxbiV2T8FYNvKYpBljZ7henYQ1MztV5Oec/zdUJ
+	 hGwbl1z3Kn+yOTsfasyjWmUu4qbmeUGgl56SQq4eizRxmNhWUZqo07L7QgxPT0SUY9Q==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=bootlin.com;
 	spf=pass smtp.mailfrom=bootlin.com;
-	dkim=pass header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=kdPYqeFZ;
+	dkim=pass header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=b7dwUYkY;
 	arc=none smtp.remote-ip=185.246.84.56
 Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23FDF606A881;
-	Mon, 16 Nov 2026 14:37:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 23FDF606A881
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB79606A329;
+	Mon, 16 Nov 2026 14:59:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8AB79606A329
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=kdPYqeFZ
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=b7dwUYkY
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id A55361A1605;
-	Mon, 16 Nov 2026 14:37:31 +0000 (UTC)
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 073451A168A;
+	Mon, 16 Nov 2026 14:59:24 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 7157A6023F;
-	Mon, 16 Nov 2026 14:37:31 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 478D611BC0BA0;
-	Mon, 16 Nov 2026 15:37:23 +0100 (CET)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id CE9F86023F;
+	Mon, 16 Nov 2026 14:59:23 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7B7E611BC146D;
+	Mon, 16 Nov 2026 15:59:18 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1794839849; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=mJeLQgSQR6c585+OnRTLrz3aLLmsqMPrzGqWlEQ9tMU=;
-	b=kdPYqeFZxICkUypT+YwqNpM0KDvu1zvvTu+50gtmxz4duKX6XyKrYBlAFeK7ZG9P1HlhKo
-	ep/qBBo/MqUXgWAJEVr/FeU/Gyb7bekwaj7zRsZjMKbZBSILKKQJrUvGKwnnL24lxd8Wr8
-	SYy4591p56rBsSToCPEMsAA2i5q18/b6Ep1FlRzPXA5MMjJgQRuLyxKH/ze5KJ13jZApVO
-	YnT6CjG4UPV/sAuWr8uaSBF9NeA/LduzIe4zVebqP+oBiUzmKxZeNnwvn0JCulzLv6bczf
-	MYfWqL/wqRU6XPtuEtai5IJzAS4mtIocYRp/vwMlwKh3n7UL2+Wlz1RgFt35uA==
+	t=1794841162; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 in-reply-to:references; bh=k+z1e8ZYHmpUCjSLI93JX1rRkKOX03qgDSkkP9m7sJM=;
+	b=b7dwUYkYBncloh3qf///PWv/FCi82wnJRMnDsiFy6tRyanBxT+0HFmm/Vlr0JJpHuBBvz4
+	X3Gyqd5Or/le63nZuammyJqDBqmZuxdufszUfHFHGDjEPDI4Xjy0NslQiDmfKr0XWcdZmN
+	x8SEbMWNRls/gJnQTF1zpN8hmYzsE+htWV+/FCVpZC7io56+cOrr75yNLKWfwOFU3r0Un8
+	My8OC73w5GOHgHYcfVuKgPn1uWwGS+gD77+WiVrd1NbCUW8nJ7HauPvXFc2Z1QQ+Ifwb+6
+	wIBOgS+FDEcTCssTR+BsRsV364Mwu0sIf9ebrzkLtOkXfKVxE5WHxktrznAEAg==
 From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Kalpesh Solanki <skalpesh942@gmail.com>,  alex.aring@gmail.com,
-  stefan@datenfreihafen.org,  davem@davemloft.net,  edumazet@kernel.org,
-  kuba@kernel.org,  pabeni@redhat.com,  horms@kernel.org,
+To: Wentao Liang <vulab@iscas.ac.cn>
+Cc: Alexander Aring <alex.aring@gmail.com>,  Stefan Schmidt
+ <stefan@datenfreihafen.org>,  Andrew Lunn <andrew+netdev@lunn.ch>,  "David
+ S. Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@kernel.org>,
+  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
   linux-wpan@vger.kernel.org,  netdev@vger.kernel.org,
-  linux-kernel@vger.kernel.org,
-  syzbot+9ea34da5ca6100593c90@syzkaller.appspotmail.com,
-  stable@vger.kernel.org
-Subject: Re: [PATCH] ieee802154: nl-mac: validate device pointers before
- dereference
-In-Reply-To: <776e6791-2677-4bd1-ac00-4eef07d5a4a6@lunn.ch> (Andrew Lunn's
-	message of "Sun, 1 Nov 2026 20:43:29 +0100")
-References: <20261101092219.1278751-1-skalpesh942@gmail.com>
-	<776e6791-2677-4bd1-ac00-4eef07d5a4a6@lunn.ch>
+  linux-kernel@vger.kernel.org,  stable@vger.kernel.org
+Subject: Re: [PATCH] ieee802154: fakelb: release platform device if driver
+ registration fails
+In-Reply-To: <20261103102854.1340581-1-vulab@iscas.ac.cn> (Wentao Liang's
+	message of "Tue, 3 Nov 2026 10:28:54 +0000")
+References: <20261103102854.1340581-1-vulab@iscas.ac.cn>
 User-Agent: mu4e 1.12.12; emacs 30.2
-Date: Mon, 16 Nov 2026 15:37:23 +0100
-Message-ID: <878q2ssuzg.fsf@bootlin.com>
+Date: Mon, 16 Nov 2026 15:59:17 +0100
+Message-ID: <87qzgkrfei.fsf@bootlin.com>
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Post: <mailto:linux-wpan@vger.kernel.org>
@@ -78,34 +74,26 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-wpan+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 X-Last-TLS-Session-Version: TLSv1.3
 
-Hello,
+On 03/11/2026 at 10:28:54 GMT, Wentao Liang <vulab@iscas.ac.cn> wrote:
 
-On 01/11/2026 at 20:43:29 +01, Andrew Lunn <andrew@lunn.ch> wrote:
-
-> On Sun, Nov 01, 2026 at 02:52:19PM +0530, Kalpesh Solanki wrote:
->> A virtual network device (such as a TUN interface) can have its link
->> type set to ARPHRD_IEEE802154 via ioctl(tun_fd, TUNSETLINK,
->> ARPHRD_IEEE802154). However, such devices do not have an IEEE 802.15.4
->> private context allocated (dev->ieee802154_ptr is NULL) and do not
->> register MAC operations (dev->ml_priv / ieee802154_mlme_ops(dev) is NULL=
-).
+> fakelb_init_module() registers a platform device and then registers the
+> platform driver, returning the result of the latter directly. If driver
+> registration fails, module initialization fails and the module exit
+> function is never run, so the platform device is never unregistered and
+> leaks.
 >
->> Fix this by ensuring dev->ieee802154_ptr and ieee802154_mlme_ops(dev)
->> are non-NULL before proceeding in ieee802154_nl_get_dev(),
->> ieee802154_dump_iface(), and ieee802154_llsec_dump_table().
+> Check the result of platform_driver_register() and unregister the device
+> on failure. Also check the device registration result, which can be an
+> ERR_PTR, before using the stored pointer.
 >
-> Did you consider the other fix? Is there a use case for setting a TUN
-> interface to ARPHRD_IEEE802154? If not, maybe return EOPNOTSUPP, or
-> EINVAL?
+> Fixes: e1e49b641387 ("drivers/ieee802154: IEEE 802.15.4 loopback driver")
+> Cc: stable@vger.kernel.org
+> Assisted-by: DeepSeek-V4.1-Flash and OpenAI Codex
+> Signed-off-by: Wentao Liang <vulab@iscas.ac.cn>
 
-Sorry for the delay, I was away for two weeks, but I definitely agree
-that I (we?) never intended to add tun support for WPAN devices. I don't
-think it really makes sense anyway. So yes, preventing the 802154 "TUN
-type" is likely the way to go IMHO.
+I don't think it is super useful, but it's not wrong either.
 
-Thanks,
-Miqu=C3=A8l
+Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
