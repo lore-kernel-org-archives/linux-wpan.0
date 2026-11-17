@@ -1,69 +1,71 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.171.202.116
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794910156;
-	b=VzjLxsyI6A32+NNgBwfHEOej5DrfQ+SNtuWUf3dT8z7Fxi1oDalasjNeC31qxw8hRagW
-	 lTLk9h/9PHMhl0XSiCmFCDBDmW75aTibhpS8c8EKbFkmQMvsr1EuK8WaqXPLWqRZb+Ii1
-	 H/mIdBc+WK1ko4Sn5vCLE01zFWYevJFfZeeJAATxa1ifUAV4bZDpWci6RrpG3SW1DxJfe
-	 jfov/u8kMoqs9g7u/tcm6Pt/e1b6GmQevhf3/SmArdvWVABUqc2UYa188kAkUTTftb/LY
-	 U2baT9hapmcpMMzIkcluh0egVKs2aIaXXc4YrQad0qFP1ao2HODijbhAhm5lZnQTbVQ==
+	t=1794910615;
+	b=L9HjYmUcI5lJppAZgc3HqAH5CnPwTfeIEywbEUWi3aMwqc1CA0HLyi1ZP8HIVm+vwfim
+	 ZsEnoPPgtPXf/Mjjg8aLD9yZKFk0RnlK85LHbA5bLulXLM49ABT7HOndwr+nNE90rJk5L
+	 Z1DAZbvUFPHDQ+09d3/pRUBCO6BsOfJw0WlintXiqxnl41Y3oOYX2pByWM5k+ZcLQKmkS
+	 DJ/tzzT7c+qHVO7RkgtfpaCNE9uZ0zUvWiryMQorKCF+GRC9kOfDkRUh3AYfUi1swi4qC
+	 +mysVidhcnfIzfuxDGseGq7xiBsz41b4GCMKlmG7wiT5qeDRgknT/Kx5ebd7Vhg/ILA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794910156;
+	a=rsa-sha256; c=relaxed/relaxed; t=1794910615;
 	h=DMARC-Filter:Received:Received:Received:DKIM-Signature:From:To:Cc:
 	 Subject:In-Reply-To:References:User-Agent:Date:Message-ID:
 	 MIME-Version:Content-Type:Content-Transfer-Encoding:
 	 X-Last-TLS-Session-Version;
-	bh=efFy5qzGhOXzdl7ha+UrFef5foRsVEqpNLPg/lX46CI=;
-	b=wM6m+sIEzFX93Jh6DfUFRnEAF/dG0bFzrWjofCfXAMiZcHrCDG6zy28s5N9yAyxGVu0g
-	 8/sCFYHen3DGj4xwjlouHa2Nk93bjvJZYWW5UdnSBNU7oD++jMbEABPZVjJLvFWo2NKxM
-	 pdan8o7uI9W9l5P2dm9B3CWI8xNvUkTrEf5aNil18Ql5PzdMDIRywBscqX0HjMelxhSdi
-	 E7XG5ka4TBwJ+lDPWA1nSsXZZOagP4NTgBdGbso1UynQAOs9yCyUcaKPs8ZY5jQLw0AZb
-	 hruehVkddTbU4A5azUqghhIS+UaPkwGr+ZaG8jmlPTeZt+OCAdtMSsS0Ph0cutISsdA==
+	bh=/yULjHrkb4hwM4FdkPiZ2o9LDpu8AeCzRvhmR///Mq8=;
+	b=0k9VXJSFc0oMHoT4S6bH+dYDFvupNXj3qRt6uUtjJWwIlt1wX7xb7xx9IiejkJOjdBa6
+	 v6PcLfYEbUfEmlxkJHgt0W0t85UgaRY2rGqelSm+Rc/rZEeMbMR1MlzdAkbHtaFn99tlf
+	 ATVKsR6I/1v/GDEoY0tRQZ2iTBmPnQCD4ciIcS6ziGsvs20ESQNHy36TW23WEcN2Rl2kw
+	 6NXdMsV6Ol3pjkbK3OFM92+MD6Up6wurFHwxbWR5WnudyP+wLOWEUioJdCs8MAYwJ6qwp
+	 eXLUlaWIQuTRhAfQO96h5JMP6AffP4W9+tzHcorksl29HNhuUV2A5rKI2ibOjjBqybA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=pass header.from=bootlin.com;
 	spf=pass smtp.mailfrom=bootlin.com;
-	dkim=pass header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=fXAjJXt7;
-	arc=none smtp.remote-ip=185.246.85.4
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	dkim=pass header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=Yukzvv8i;
+	arc=none smtp.remote-ip=185.171.202.116
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 208E7606A323
-	for <linux-wpan@vger.kernel.org>; Tue, 17 Nov 2026 10:09:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 208E7606A323
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BE44606A33E;
+	Tue, 17 Nov 2026 10:16:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8BE44606A33E
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=fXAjJXt7
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=Yukzvv8i
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 735574E41473;
-	Tue, 17 Nov 2026 10:09:14 +0000 (UTC)
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 54899C4D3D7;
+	Tue, 17 Nov 2026 10:16:56 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 481AF5FC81;
-	Tue, 17 Nov 2026 10:09:14 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 6857311BC0493;
-	Tue, 17 Nov 2026 11:09:12 +0100 (CET)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id C80F45FC81;
+	Tue, 17 Nov 2026 10:16:51 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B922C11BC0493;
+	Tue, 17 Nov 2026 11:16:47 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1794910153; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1794910610; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:in-reply-to:references;
-	bh=efFy5qzGhOXzdl7ha+UrFef5foRsVEqpNLPg/lX46CI=;
-	b=fXAjJXt7VgwfXDE9fcErcMBB17TbLufQtAQy/aQ9huR1Xx/tvA7Ehrim4GFW1ZfMKUmQUc
-	dTJc468izwMk+bSY/cE1gXkXsiUe7zqBjItFxy5WpELyXhJBQLg4qqRleg9gk+7iYdznKa
-	rrS9Qr//iVini/YPirHennlVFH+6nbDrJORNyv1hbkTUqHsmZA5p4fPcN+BCGUSTZyrDv+
-	VBwZJTYUT9R6fwzia4Z/OS+pMQ8AT1cFWU1dirOkFkElSncV5rdEtL7lqQxFDTP6Etx1Yt
-	OBg7MCMxQCY6Si2GeH5zunVH/Gl88WyhLaTpBqpfi0R6Nlc1nq2VhmNdtCEbig==
+	bh=/yULjHrkb4hwM4FdkPiZ2o9LDpu8AeCzRvhmR///Mq8=;
+	b=Yukzvv8iX5tIxIesYK4K66Yczzr2qBqS/BGaI+miClApiU0uedkLgaLvlUeUAO9W3wIaK7
+	RsOfdlO+Tuy4LmL9Q0GvEu/Lqpjor7nO3xo8qW8Van/hknyIFykY4RCm1tzjAwhkWfZBdG
+	eT0WzPTnhTz2jqW7SIaXGVxMlXmKmRDjCxMrnPvsHNGFI8aRgMFRHJgvqFH+ztCye2JfUq
+	5DvhNtgOsSXtf8e83izlYU8gh5S+A7ALy8IJm7lqNoQddMOBVvpzTbKpYUKOB9qlYCqGjS
+	rnCFUsJdNjC5ys6J4mbx63EZ6flNVrdRm2U4cNgmQI2xXv6Srvb0wE8IZ/4B7A==
 From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Roshan Kumar <roshaen09@gmail.com>
-Cc: Yousef Alhouseen <alhouseenyousef@gmail.com>,  Alexander Aring
- <alex.aring@gmail.com>,  Stefan Schmidt <stefan@datenfreihafen.org>,
-  linux-wpan@vger.kernel.org,  netdev@vger.kernel.org
-Subject: Re: [PATCH net] ieee802154: hwsim: free PIB after unregistering
- hardware
-In-Reply-To: <CANphZRNSXy4tQ9jO7RT5g2X69T-CapR3-sSood1qJfYTRUE8ag@mail.gmail.com>
-	(Roshan Kumar's message of "Fri, 6 Nov 2026 22:06:37 -0800")
-References: <CANphZRNSXy4tQ9jO7RT5g2X69T-CapR3-sSood1qJfYTRUE8ag@mail.gmail.com>
+To: Hui Peng <benquike@gmail.com>
+Cc: alex.aring@gmail.com,  stefan@datenfreihafen.org,  davem@davemloft.net,
+  edumazet@google.com,  kuba@kernel.org,  pabeni@redhat.com,
+  linux-wpan@vger.kernel.org,  netdev@vger.kernel.org,
+  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] ieee802154: hwsim: fix edge allocation leak and netlink
+ attribute validation
+In-Reply-To: <87v7809ivq.fsf@bootlin.com> (Miquel Raynal's message of "Sun, 20
+	Sep 2026 15:01:29 +0200")
+References: <20260919223434.3882824-1-benquike@gmail.com>
+	<87v7809ivq.fsf@bootlin.com>
 User-Agent: mu4e 1.12.12; emacs 30.2
-Date: Tue, 17 Nov 2026 11:09:11 +0100
-Message-ID: <87wlqbn514.fsf@bootlin.com>
+Date: Tue, 17 Nov 2026 11:16:47 +0100
+Message-ID: <87qzgjn4og.fsf@bootlin.com>
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Post: <mailto:linux-wpan@vger.kernel.org>
@@ -77,28 +79,28 @@ Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-Last-TLS-Session-Version: TLSv1.3
 
-Hi Roshan,
+On 20/09/2026 at 15:01:29 +02, Miquel Raynal <miquel.raynal@bootlin.com> wr=
+ote:
 
-On 06/11/2026 at 22:06:37 -08, Roshan Kumar <roshaen09@gmail.com> wrote:
-
-> Hi Yousef,
+> On 19/09/2026 at 22:34:34 GMT, Hui Peng <benquike@gmail.com> wrote:
 >
-> I independently reproduced and tested this issue on current wpan.git
-> (2b4707a149a5). I also prepared the requested rcu_access_pointer()
-> update. It passes checkpatch, targeted W=3D1 allmodconfig/allyesconfig
-> builds, and 200 KASAN teardown rounds without sanitizer findings.
+>> In drivers/net/ieee802154/mac802154_hwsim.c, clean up allocated edges
+>> and phys on error paths and validate netlink attribute bounds.
+>>
+>> Fixes: f25da51fdc38 ("ieee802154: hwsim: add replacement for fakelb")
+>> Assisted-by: LLM
+>> Signed-off-by: Hui Peng <benquike@gmail.com>
 >
-> Are you planning to post v2? If not, I can forward it while preserving
-> your authorship and Signed-off-by, adding my Signed-off-by as the
-> forwarding submitter.
->
-> v1:
-> https://lore.kernel.org/all/20260627235805.17310-1-alhouseenyousef@gmail.=
-com/
+> Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
 
-No v2 sent by Yousef. It is the fourth time we receive similar patches,
-can you quickly send a v2 like you offered?
+The commit message is incoherent, I would like to withdraw my tag.
 
-Thanks!
+Also, this is the fourth time we receive a similar fix. I already
+reviewed this one:
+https://lore.kernel.org/all/20260627235805.17310-1-alhouseenyousef@gmail.co=
+m/
+For which I wait for a v2 which never comes. You can take the feedback
+sent there into account (still applies).
+
+Thanks,
 Miqu=C3=A8l
-
