@@ -1,49 +1,62 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1794961809;
-	b=G5vhF578oYSnmGDEMZAValv4cXWhfkJ4hqQrRlKVI7w9mCvi3GzPurBOAesv1Hvq0Nuf
-	 e+XH3BqB4G7bFLJoBcGjUg3M0yu4K+RBsGgESgCZt5gRWMUwV18qHkOSUJXZp6Xwl+7qB
-	 ZR4unI9u3MxsucIZVtPWLXuVPgc2RqpLpxwPOOhX+t4L7jLsKxx/fvzg0BDlXq3m9iwA+
-	 kBJsFVTBfjBznjyAiOTx/XBD0bfidCjCytC5KA6H063FQ8c0n45PvfjdQu0xLzHtBTCwg
-	 y+Ai+zqD9Y6DFlZWU8XCiJQ7laaTr12rYgZw1RQuKMhqj/CvnMzm66+T11E400ncV8g==
+	t=1794967494;
+	b=1KZDAlGwOP/Df3oZYJFh8qrbVOfJkl1E6VVSzsemcy6GAuYT+Yk/de3HimHMo6E6nt/O
+	 DYhu2FWO0YXDMdr19xeOhBk/O19ulWGaYfcCjOCVctJJvtpUGF15zvkfEWKbb5cOy7lED
+	 onYMg5KzDu9xDBS8tynmjJ/fGq4jJaG5STpwaGihptbPd+5pzsxu3aLbG4VFrNb9ljNK9
+	 U+tUTLjg1kToUwHihUXUOoGrjBZ079X1pLCJZUgtWjawiC1bpB9iW5LZSGDBEFoZbCqTl
+	 soFO7g1JX5T+0KstXqvv2B2iW48Wylp90CN0TcJx+1QE0iXM6UG8xnLLBt75+rL536A==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1794961809;
-	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
-	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc;
-	bh=FLFSTzTgvHuqY+20z4nQYiKE6NAG46HA4Pa6c/Rj/M8=;
-	b=KjlrmfvXV1HWWrM2PErc6M3Zy5Q/4+XV+PAjVt3tLn1Z/QT7wyNaSRAfYzwHqDK/JUz/
-	 vS4oVfcwX4lKBspVyIEN5xomTQyqpHwzsY99m2hrWVu+wqeTPwlzynBhqBxrbIONMUuQo
-	 OsYajK5j5TAxd6xC7a3VnOq8LqgHb+IDjz1Q4Qkt73dZZoWElQq59QfrTEkX1kvFNwWWZ
-	 tlZcGNOndjgcbD7Fu3sycd8tKO10qC+0+aQNviMXf9+oDWK6n9uiUPzzy32eq9WSUvSgk
-	 h1gZUB5saohGh0POvZMEv5xd79bFk40qUThYVihHQQsJjSEPphXl6d8igvYRQ0IfFvw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1794967494;
+	h=Received:DKIM-Signature:Subject:From:To:Cc:Date:Message-ID:
+	 In-Reply-To:References:X-sashiko-severity:Content-Type:
+	 Content-Transfer-Encoding:MIME-Version;
+	bh=7idpOK0uLj0IeEH4I8ykLNX0Cq8hKyMbZ0eKNeKvegk=;
+	b=tzwrfX3nKg2IZtmfO9OtoWeroCqaALNstO1IqOIZvxVtjap3gjeDLZVjULylpv+7ocwb
+	 nq/gdYhq0Feyjal1F8/hGWTViIWnoBn0QqSN7e94T+lWCA6BnSnfGXTu7GTNGDgC1JTxb
+	 krVvJPLLn90FHT0cGTO2A7oW61/+Lcm+Na5egYNNkOcmBtZLHB+skCCfY6nTyo5l8vmZX
+	 DkuCMIUJTICQBnbJ2o6gs6BEJXPCQXQStDe2EnkN+G6MgFfhvB0Q1IQIfNfRi5DOH5ck0
+	 CWxHV9y2vdQDJyyfdc2SD4NV+CvBcFDcXOUpCZEU7Y6vRokKu4Uw9FJiU5Hs6gubomg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FX6YvtvS;
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nTFcnP8M;
 	arc=none smtp.remote-ip=100.103.45.18
 Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1))
+	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65141606A31C;
-	Wed, 18 Nov 2026 00:30:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C7D606A31C;
+	Wed, 18 Nov 2026 02:04:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=FX6YvtvS
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09E4E1F000C4;
-	Wed, 18 Nov 2026 00:30:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=nTFcnP8M
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 216141F000C4;
+	Wed, 18 Nov 2026 02:04:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
-	s=k20260515; t=1794961809;
-	bh=FLFSTzTgvHuqY+20z4nQYiKE6NAG46HA4Pa6c/Rj/M8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc;
-	b=FX6YvtvSn6ASXYLwgRspXj6sUWUpGx3ppTDB+6G8ni/XIRXn1YPR8ui0j6BHP0VB8
-	 sfl05aOw6lj6c6k59P58XLllop85jGSlnESHQlLlGluTGV914DqiO+Xd2eUkIjTvJi
-	 ivu5YSzOma+PuyToik8lBQtgnZKlmmR/MSAQa9CJNXlLdX5to8kDXCPGn+TADVog83
-	 bWGGYLoCiO+qMzrP1cd3CglvosF9WZVzm/EjVHllW8n7saRqJ7DWR/tld3SOj2Vrqz
-	 +gK0aisppO6RcIshOEFK3WhJDbapEnMmQBFgpXn7oTICm0StfUBgsQvXSoKXI3sErd
-	 5T/uZuGXklyCQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F15C9392B1FA;
-	Wed, 18 Nov 2026 00:30:08 +0000 (UTC)
+	s=k20260515; t=1794967494;
+	bh=7idpOK0uLj0IeEH4I8ykLNX0Cq8hKyMbZ0eKNeKvegk=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=nTFcnP8MbRS5d4pxU3UnKAsWRer/12OXCwy/dor8M6yoTHEA6ZXvCCEieve4SwUmx
+	 9Q7uoAMK4V62w5DhJfeKkPM4tynL4KQp4+4lhQVRQ2EhHxDbcAD6K+0fQ3Ck24TkCH
+	 DZkLfUFrugvmrJbypvhvABHyS9vW6J5ZNQfyO18Lriqrksd3UxTTE+Hv3gWlP4YUGR
+	 A+OSdRId3pCz94FLWEo4tuJ05im+g/nFdgHylmnR7NAUp6I5P++IlPiNYVaEz0kZW7
+	 J6lipFXnG1ggEWg8XE+MMXF7VVuJGAZDorzd7ebeKRKO9Fs4j5RH1U1ZJP/QR6ywxl
+	 nB1s8h5XxRrdQ==
+Subject:
+ Re: [PATCH net] mac802154: remove redundant security_enabled assignment
+From: netdev-bot+sashiko@kernel.org
+To: petrvaganoff@gmail.com
+Cc: alex.aring@gmail.com, stefan@datenfreihafen.org, miquel.raynal@bootlin.com,
+ linux-wpan@vger.kernel.org, davem@davemloft.net, edumazet@kernel.org,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ phoebe.buckheister@itwm.fraunhofer.de, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org,
+ stable@vger.kernel.org
+Date: Wed, 18 Nov 2026 02:04:52 +0000
+Message-ID: <179496749259.3136.6007006994790888929@kernel.org>
+In-Reply-To: <20261116065235.27348-1-petrvaganoff@gmail.com>
+References: <20261116065235.27348-1-petrvaganoff@gmail.com>
+X-sashiko-severity: High
 Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Post: <mailto:linux-wpan@vger.kernel.org>
@@ -53,47 +66,122 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-wpan+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH wpan] mac802154: llsec: reject secured frames with
- security
- level 0
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <179496180753.1369671.1262843769170490245.git-patchwork-notify@kernel.org>
-Date: Wed, 18 Nov 2026 00:30:07 +0000
-References: <20261110-llsec-seclevel-none-v1-1-06ef143e467f@gmail.com>
-In-Reply-To: <20261110-llsec-seclevel-none-v1-1-06ef143e467f@gmail.com>
-To: Joas Antonio <joasantonio108@gmail.com>
-Cc: alex.aring@gmail.com, stefan@datenfreihafen.org,
- miquel.raynal@bootlin.com, davem@davemloft.net, edumazet@kernel.org,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
 
-Hello:
+Thank you for your contribution! Sashiko AI review found 2 potential
+issue(s) to consider.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Critical: 0 · High: 1 · Medium: 0 · Low: 1
 
-On Tue, 10 Nov 2026 09:03:23 +0000 you wrote:
-> From: Joas Antonio dos Santos <joasantonio108@gmail.com>
-> 
-> mac802154_llsec_decrypt() handles every received frame that has the
-> Security Enabled bit set.  The security level is taken from the
-> auxiliary security header of the frame and is not required to be
-> non-zero.  The only check that looks at level 0 rejects the frame only
-> if level 0 is not allowed by the matching seclevel entry, the entry has
-> device_override set and the device is not seclevel_exempt:
-> 
-> [...]
+If you believe none of the issues are legitimate, please reply to each
+issue of Medium severity or higher and explain why the AI is wrong.
+If any of them are legitimate and you plan to respin, please let patchwork
+know by including "pw-bot: cr" as a separate line at the end of your reply
+(one such reply per series is enough).
 
-Here is the summary with links:
-  - [wpan] mac802154: llsec: reject secured frames with security level 0
-    https://git.kernel.org/netdev/net/c/3e8c853c959e
+- [High] The fix relies on an invariant that does not hold.
+- [Low] The subject 'mac802154: remove redundant security_enabled
+  assignment' presents a bug fix as a cleanup.
 
-You are awesome, thank you!
+--
+
+mac802154: remove redundant security_enabled assignment
+
+The commit removes the assignment hdr.fc.security_enabled = cb->secen from
+ieee802154_header_create(). After that, mac802154_set_header_security() is
+the only place that sets the security bit. This targets a KMSAN uninit-value
+report in ieee802154_hdr_push_sechdr(), triggered by a stale cb->secen after
+WPAN_SECURITY_ON followed by WPAN_SECURITY_DEFAULT.
+
+> mac802154: remove redundant security_enabled assignment
+
+[Severity: Low]
+This isn't a bug, but is "redundant" the right word for this line?
+
+Removing it changes the transmitted frame. When
+mac802154_set_header_security() takes this early return, the removed line
+was the only thing setting fc.security_enabled:
+
+	if (!params.enabled ||
+	    (cb->secen_override && !cb->secen) ||
+	    !params.out_level)
+		return 0;
+
+This is a fix tagged for stable. Would a subject like "mac802154: fix
+uninit-value in ieee802154_header_create()" be more accurate?
+
+> diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+> index f437b8daa00d0..7b7332805ecce 100644
+> --- a/net/mac802154/iface.c
+> +++ b/net/mac802154/iface.c
+> @@ -368,7 +368,6 @@ static int ieee802154_header_create(struct sk_buff *skb,
+>  
+>  	memset(&hdr.fc, 0, sizeof(hdr.fc));
+>  	hdr.fc.type = cb->type;
+> -	hdr.fc.security_enabled = cb->secen;
+
+[Severity: High]
+Does this fully close the uninitialized hdr.sec read in
+ieee802154_hdr_push_sechdr()?
+
+The commit message relies on mac802154_set_header_security() keeping the
+invariant that security_enabled = 1 implies hdr->sec is initialized. That
+function only writes some of the fields:
+
+net/mac802154/iface.c:mac802154_set_header_security() {
+    ...
+	hdr->fc.security_enabled = 1;
+	hdr->sec.level = level;
+	hdr->sec.key_id_mode = params.out_key.mode;
+	if (params.out_key.mode == IEEE802154_SCF_KEY_SHORT_INDEX)
+		hdr->sec.short_src = params.out_key.short_source;
+	else if (params.out_key.mode == IEEE802154_SCF_KEY_HW_INDEX)
+		hdr->sec.extended_src = params.out_key.extended_source;
+	hdr->sec.key_id = params.out_key.id;
+    ...
+}
+
+It never writes sec.frame_counter or the reserved bits that share a byte
+with level and key_id_mode. In ieee802154_header_create(), hdr is on the
+stack and only hdr.fc is cleared by the memset above.
+mac802154_header_create() has the same pattern.
+
+So on the normal llsec TX path (llsec enabled, out_level != 0),
+ieee802154_hdr_push_sechdr() still copies stack memory into the skb:
+
+	memcpy(buf, hdr, 1);
+	memcpy(buf + 1, &hdr->frame_counter, 4);
+
+frame_counter is overwritten only later, in mac802154_llsec_encrypt(). By
+then, packet taps in dev_queue_xmit_nit() have already seen the header, as
+the TODO comment in net/mac802154/tx.c notes:
+
+dgram_sendmsg()
+  wpan_dev_hard_header()
+    ieee802154_header_create()
+      mac802154_set_header_security()
+      ieee802154_hdr_push()
+        ieee802154_hdr_push_sechdr()
+  dev_queue_xmit()
+    dev_queue_xmit_nit()
+    ieee802154_subif_start_xmit()
+      mac802154_llsec_encrypt()
+
+If encryption fails with -ENOKEY or -EOVERFLOW, mac802154_llsec_encrypt()
+returns before it pushes the header again. The 4 uninitialized
+frame_counter bytes then stay in the data that AF_PACKET taps copy to
+userspace.
+
+The reserved bits survive the memcpy(hdr, buf, 1) in
+ieee802154_hdr_get_sechdr(). mac802154_llsec_encrypt() then pushes them
+again, so they also go out over the air and into the CCM AAD.
+
+Should hdr (or at least hdr.sec) be zero-initialized in both
+ieee802154_header_create() and mac802154_header_create()? Another option
+is to memset hdr->sec in mac802154_set_header_security() before filling it.
+
+>  	hdr.fc.ack_request = cb->ackreq;
+>  	hdr.seq = atomic_inc_return(&dev->ieee802154_ptr->dsn) & 0xFF;
+>
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Sashiko AI review · https://netdev-ai.bots.linux.dev/sashiko/#/patchset/20261116065235.27348-1-petrvaganoff%40gmail.com
