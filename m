@@ -1,72 +1,49 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795121590;
-	b=Tn2QTVun6LfXvM4wI4JqC0/RW5gdfnhs5qwfpk8MtzK8ST8iu+IPgi9//EvSr9MT3uUd
-	 d0TPtgQXFbRFreas+nqMo4Zs7jz9JLrHmpSOPT+bbIv6R91itXt3BdDbMjR21IHrY8+8f
-	 sNuBlBmv2yXNoBZtStCuQo4NIEqEhb02nGhp5NdCHV+uV/dM3h+XtIG4cUWHoiSp5haWU
-	 V5qI1V95pqJETYWJXoZmpVdWDemG6dNpgoxzFpeJ+SlfokingLXEQgl6A6Dza7AmUTtKF
-	 H32xuogKfbgBKXKoKMDuPQsVy6QUhMuU5r9Qgkiid8O3nxx0v9iWLR947wAh4MUjK+g==
+	t=1795141209;
+	b=I+BiXQB4TI7KPHEFhBAabxOxsl7jrC4itAik5dG8QpcFrThc5vI+scJKyPzaM4A02VkP
+	 WAVch3KhL+l8af7JQ85ZOEbEqeFtrT9U1HADiiitqBi6TxsFaOzf0Mp2WpLmzUQF925Wv
+	 Q2jObH9G0OFDy4I7HgN80JqONd9jGGtCbbOv69hqfd9WSw7VJWv/EVSsgUmJkt7ONYrpz
+	 KB0ccc91wkakUgoCeHQ3tijVZyVaKEwcLFDXxFCRgH2JCws2M2LzfQNodABTvKxppCAuI
+	 DP902ZnGN/OB3c6XmQeNxq+264Zckx4sLelZ0Yz5b+1QEtgg8UrcSKa/fX6/llbmQNw==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795121590;
-	h=DMARC-Filter:Received:Received:Received:DKIM-Signature:From:To:Cc:
-	 Subject:In-Reply-To:References:User-Agent:Date:Message-ID:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:
-	 X-Last-TLS-Session-Version;
-	bh=bhQV5Yxj7EHBlSO67J3AjWtG+BkdwCTCOMv6otj2Ow0=;
-	b=qjZiLFyk49ydUIZFc0S6MKaosfUO+KKbGhUkQp0nfNuZloaILQMuDkuFB92D5pomKGAw
-	 g0uz+1RGPIqCujVt6gWOXAoViPj2lmAn8l68uoBFW5bNTDHr+wjA6R4/wx8NUC0cilJSK
-	 j9v2uWIJDaNOyW8wX2mRIRCdHSGGLIvaq4Z4w+i/j4pqkMo5uaUo/SIvcZPXKObMuG9yH
-	 cNRYrpbO/T1l8SFFMPJp9RCUmVWCtjFYtM7MqpC6GE/WiTg9BgKQcwDfE/AByyZwgpRlm
-	 Vksvgcw00lUR42AK9yi2Do5kZHPcC6wjH1SlRc5+ejq35f3XjPhIql6HoA20Ocdg+cw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795141209;
+	h=Received:DKIM-Signature:Received:Content-Type:MIME-Version:
+	 Content-Transfer-Encoding:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc;
+	bh=mfJyAF4Nrl+hgTB1RD7oeC4gMN7pBo8CsmEpvgXkV68=;
+	b=Z7sxUJ1OmSyxRH8BbR+IXRmcP8pjnCUuTKmJtfHSl/yEhQXA7xwB6DZgJB72onIQcrHG
+	 QcW7KTym33n8lGkbYjPrUMT5VxHsnWh6lpWzYgLUhnr+Sghbs9sZJrWJIletaUoRUjZC6
+	 bt7P5+yhjIUJyeiveaGG/NMFxC81II2Q23s7SDmooo4Uon5zxMnIVOQr6TAaZMjOrAPFs
+	 Cpmk74DyMYkIpGd5hi1606NOKqCIjY19i2YxRI/5LQoN0ziXFxnmLoEViBGpo0cuNV62c
+	 x6oGyr+ZpqXz4RuMBznYxrf6+MiPCRiV2RECZCBF1qPCcHMy3GK8+kKf3jxMPiETH3g==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=bootlin.com;
-	spf=pass smtp.mailfrom=bootlin.com;
-	dkim=pass header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=yWovXsCL;
-	arc=none smtp.remote-ip=185.246.85.4
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=m+LG1K9b;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D048606A901;
-	Thu, 19 Nov 2026 20:53:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 7D048606A901
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FB38606A320;
+	Fri, 20 Nov 2026 02:20:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=yWovXsCL
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id C55E44E41674;
-	Thu, 19 Nov 2026 20:53:06 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 894626035B;
-	Thu, 19 Nov 2026 20:53:06 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3507411BC0E78;
-	Thu, 19 Nov 2026 21:52:57 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1795121581; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=bhQV5Yxj7EHBlSO67J3AjWtG+BkdwCTCOMv6otj2Ow0=;
-	b=yWovXsCLMroYPdQQehh0R52sZplMpO3lhiFSbOiM1K/uIjSvuxCqxC0IOjO31Qu9h1EpEF
-	CHQfBFtZKOSMqFfP5v0U+9QE3LKYgY7cZTSx3mydjnxeo3y9j5sAr9usrnVf+0dJ/m4FqZ
-	OOMfi4qXo33VwF9sVtULZClWd5fPiHGr/XSrT77GbbqG07MlBylWqzRqtEcKgFGN7zxMW4
-	AqI4OcEJlcOQd1HQyZWmRfgO+pbDqla1q/HPwGYF6tzQ5slrJ4fY/SBrfeyB/ef0ueG4Xd
-	OIAW9/qHNpv18oPKscFMkyUt/diPgrDB4TkjHTUL4wr4vOksk04FNFzBE9bBhw==
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Andrey Misiurov <amisiurov@cloudlinux.com>
-Cc: Alexander Aring <alex.aring@gmail.com>,  Stefan Schmidt
- <stefan@datenfreihafen.org>,  linux-wpan@vger.kernel.org,
-  netdev@vger.kernel.org,  "David S . Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@kernel.org>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
- Abeni <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,
-  linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] ieee802154: keep the original error after a netns
- rollback
-In-Reply-To: <20261119172413.2068073-1-amisiurov@cloudlinux.com> (Andrey
-	Misiurov's message of "Thu, 19 Nov 2026 18:24:13 +0100")
-References: <20261119172413.2068073-1-amisiurov@cloudlinux.com>
-User-Agent: mu4e 1.12.12; emacs 30.2
-Date: Thu, 19 Nov 2026 21:52:57 +0100
-Message-ID: <875wxsczme.fsf@bootlin.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=m+LG1K9b
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06E711F000C4;
+	Fri, 20 Nov 2026 02:20:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795141209;
+	bh=mfJyAF4Nrl+hgTB1RD7oeC4gMN7pBo8CsmEpvgXkV68=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc;
+	b=m+LG1K9bvGCj2R2kG8VaDT0ED2pIi/KORQkjlzO1qsGLGLRn5bB9VbcEpODdxY0xn
+	 f7KeMnyZ+DefcVHOfVI6EUb7PLXyagaWfTs8NADjgD7LS2vgchej+xdeiuwzGYYxZN
+	 r6kbiD32Cmk3/KmIDICo4aHlt1C7sC0xVpEP0BYsVydoLfwfCqgy28alOLSuy82ISd
+	 Ga9F5rg0uc9d0nhY4K2JEN7sBUvxjL9I1fQcEBSog2JS8FIKZwSYJpzEe/AXrLYYAY
+	 CAW/opvXrZ63KGXjYfxlGo2Xme9+CbQF/tCIZtIOF7gC0Rx0IWEZoMtZt5RN+3hyey
+	 XgpzZaeKHucnw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id F15A83808209;
+	Fri, 20 Nov 2026 02:20:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Post: <mailto:linux-wpan@vger.kernel.org>
@@ -76,42 +53,46 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-wpan+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: dropreason: add
+ SKB_DROP_REASON_FRAG_MEM_LIMIT
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <179514120753.3982074.11609481457097425457.git-patchwork-notify@kernel.org>
+Date: Fri, 20 Nov 2026 02:20:07 +0000
+References: <20261118070524.310356-1-jiayuan.chen@linux.dev>
+In-Reply-To: <20261118070524.310356-1-jiayuan.chen@linux.dev>
+To: Jiayuan Chen <jiayuan.chen@linux.dev>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@kernel.org,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, alex.aring@gmail.com,
+ stefan@datenfreihafen.org, miquel.raynal@bootlin.com, dsahern@kernel.org,
+ idosch@nvidia.com, pablo@netfilter.org, fw@strlen.de, phil@nwl.cc,
+ linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org
 
-Hello Andrey,
+Hello:
 
-> +++ b/net/ieee802154/core.c
-> @@ -222,6 +222,7 @@
->  {
->  	struct wpan_dev *wpan_dev;
->  	int err =3D 0;
-> +	int ret;
->=20=20
->  	list_for_each_entry(wpan_dev, &rdev->wpan_dev_list, list) {
->  		if (!wpan_dev->netdev)
-> @@ -249,6 +250,7 @@
->  	return 0;
->=20=20
->  errout:
-> +	ret =3D err;
->  	/* failed -- clean up to old netns */
->  	net =3D wpan_phy_net(&rdev->wpan_phy);
->=20=20
-> @@ -264,7 +266,7 @@
->  		wpan_dev->netdev->netns_immutable =3D true;
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Shall we just shadow int err in this loop? the current implementation is
-correct but is a bit strange (having ret and err next to each other).
+On Wed, 18 Nov 2026 15:05:19 +0800 you wrote:
+> This is used to track fragments dropped when the reassembly memory is
+> over the limit (ipfrag_high_thresh, ip6frag_high_thresh).
+> 
+> Fragments dropped because high_thresh is 0 get this reason too, the
+> same way they are counted in IPSTATS_MIB_REASMFAILS.
+> 
+> Tested with pwru.
+> 
+> [...]
 
->  	}
->=20=20
-> -	return err;
-> +	return ret;
->  }
->=20=20
->  void cfg802154_dev_free(struct cfg802154_registered_device *rdev)
+Here is the summary with links:
+  - [net-next] net: dropreason: add SKB_DROP_REASON_FRAG_MEM_LIMIT
+    https://git.kernel.org/netdev/net-next/c/2cb41b6bea62
 
-Thanks,
-Miqu=C3=A8l
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
