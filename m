@@ -1,70 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.103
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795182098;
-	b=Gvc2uKvOUHyLjMbPhzV+CS0OLDrJN5P57D4iTptNxdarbQlhx+bXz9i6IapzO16LUSVa
-	 kDMHyuFTfVWOK2kS07MmMFlHt8+jXrx+1pNLSFWxZtNkq5/Yz6vfooypx+1cPgyHrYABO
-	 BKZQyFmwmVE0NcG1UQgurbXoRoVnlxWIS8jvHvW25KZn2UaucEXw/XnLCou/fqLPqzpx4
-	 NTuZ8SZ7q8prjZo/PwmCPe/P+HsveMslVO7IAIs5sIiO7WZpCHSSQd2MMEB4seGD/ahwa
-	 N0fyWIpZKPSbELylS/OIuHKdVfariu2ZAMKf8z8/xj6j/b/2Npd5AGJ6AojwqhnvnHw==
+	t=1795267878;
+	b=jfhO+biiE5g+GRKEgdOKzCt/rnZ/IX137o+LIUnjW3JEeWeIatDS7vLyirldLub9NOnj
+	 9GOzbIS93X1FCLz51fPP7x9ATfGixpOGp8GttzBJ+TCBxjKZkRfidr3mJ6MTaJd42L7oL
+	 LYcE68W0BZQ8IffY1dCpcATXk0Juc7vM712HoKXn0XBb9mCYALL5PZFOQRLBLCw6peV2F
+	 EdiQ+WK8SFTbeJ5OmovHcB8r8XJQ06lZWlY3+ZXG995YvNO8MdfNAxjtE0ymD1S1IWtFF
+	 Wh7Vn3KDZxPbW7oZXG2c4wlTC/9Io2Z+fDpwUlUl6NaVUSJLliOp+EJEpbXpx6pcsng==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795182098;
-	h=DMARC-Filter:Received:Received:Received:DKIM-Signature:From:To:Cc:
-	 Subject:In-Reply-To:References:User-Agent:Date:Message-ID:
-	 MIME-Version:Content-Type:X-Last-TLS-Session-Version;
-	bh=G0kPPdNTzeRCcZm0NzcTP3e6FuzOTd+f7at7BqtBxS8=;
-	b=nTinWq0rBB61zpN5ve+qn++QQvGL/Pp6S6LlI8tNILMOO1dapVtFhwc346QjxU+0SvOr
-	 DLyFC88s8LA5Eu7jp3Nu/s/gBxMRmHViPUy3kBaRAW9ZHPz09Jecnu67fsU9wRIRvMux7
-	 zYtba1bYhy+JzxosLKCp3TCrbRrjUhQzCWq1T+mNy+o/pPXpTg2jsK+QsQdHbh5ClKKrQ
-	 BksoSl2paDIJlQdtc7JLXU91KVg1+i5k6qa3XwkrJqERlshH9REFEXpwKFrAZyP3hPXtJ
-	 EvByRxyYwUda0zyZlnyOG0y9egFvYOBUYg1PGbPZcRG1uR4HH+mSaeYSaQjLkbuVrXQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795267878;
+	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
+	 Feedback-ID:X-Pm-Message-ID:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding;
+	bh=r0MMOix26sOHkfFFJ+zGS98rI+ooroQaiLjBZdvKtOc=;
+	b=2x7LqMVQbpeJJcgc7EktjjJRPCLubzjmy2UgA569MI+fTfeCLyvjFtCtpnf6w+4PlR+e
+	 mhc+aOT6IzH0nMC85PATYaLz3T+mojdgzCidRItLRrNMufCGgkXVnM9Uvf4OB/XjV2Vp3
+	 015rdjCCJgMpkxx1lyjriIGA69na3MGcG801tru4KkdLmiGeAH5oKWNS/zExlF3IXPEde
+	 BTe3A4ArgcGgje/45c68V9z6+bdsd6PMrGEYWnQnUKhlR9Db1dwL857MbNCONYniODFPr
+	 0xirsUHmTzC0A0sTHtJRNpdsVAciTceE35ZVgNI4v4wHJK1RzRDqQtYbxhV2096wcNw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=bootlin.com;
-	spf=pass smtp.mailfrom=bootlin.com;
-	dkim=pass header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=EYscEoj9;
-	arc=none smtp.remote-ip=185.171.202.116
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	dmarc=pass header.from=proton.me;
+	spf=pass smtp.mailfrom=proton.me;
+	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=UdKJC4Op;
+	arc=none smtp.remote-ip=185.70.43.103
+Received: from mail-43103.protonmail.ch (mail-43103.protonmail.ch [185.70.43.103])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEEFA60A2602
-	for <linux-wpan@vger.kernel.org>; Fri, 20 Nov 2026 13:41:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BEEFA60A2602
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC89B606A320
+	for <linux-wpan@vger.kernel.org>; Sat, 21 Nov 2026 13:31:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BC89B606A320
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=EYscEoj9
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 9010BC6221D;
-	Fri, 20 Nov 2026 13:41:41 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id D2899601B9;
-	Fri, 20 Nov 2026 13:41:35 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5554011BC01FA;
-	Fri, 20 Nov 2026 14:41:26 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1795182091; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=G0kPPdNTzeRCcZm0NzcTP3e6FuzOTd+f7at7BqtBxS8=;
-	b=EYscEoj9YGnxqlJHMKsG6JZw95F1h+t2njcdESsHryNpDYMN7mkPyFtwVd0rnT4pSiRCXH
-	Qs02vV6kGG5IRBy/26ighiaZbkvSX7cQf1ZeuX72BDUwvqWBlosmatNayyhKz651iB+S/5
-	tgoTi5i9ta6xaUr0aJ/+1fPaX6TqxYhNwVvZJ7k2vrDvNHPUNZMtQdb9KcKvyJyS8pDftz
-	pFQFO4aF1CYn2V0wxDdsGdWiqg+Hdrd30GHoxjWCNMVXVdUIj8BSnSZj1zrbLjtXbeAQ0y
-	TffZmtSgHyQlIgxBxjmSR8Jsir+MgtIpdSKCQry2YX6uj40diKkzo/mhAl0KkA==
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Petr Vaganov <petrvaganoff@gmail.com>
-Cc: alex.aring@gmail.com,  stefan@datenfreihafen.org,
-  linux-wpan@vger.kernel.org,  davem@davemloft.net,  edumazet@kernel.org,
-  kuba@kernel.org,  pabeni@redhat.com,  horms@kernel.org,
-  phoebe.buckheister@itwm.fraunhofer.de,  netdev@vger.kernel.org,
-  linux-kernel@vger.kernel.org,  stable@vger.kernel.org
-Subject: Re: [PATCH v2 net] mac802154: fix uninit-value in
- ieee802154_header_create()
-In-Reply-To: <20261120084537.31991-1-petrvaganoff@gmail.com> (Petr Vaganov's
-	message of "Fri, 20 Nov 2026 15:45:37 +0700")
-References: <20261116065235.27348-1-petrvaganoff@gmail.com>
-	<20261120084537.31991-1-petrvaganoff@gmail.com>
-User-Agent: mu4e 1.12.12; emacs 30.2
-Date: Fri, 20 Nov 2026 14:41:25 +0100
-Message-ID: <877bi7boxm.fsf@bootlin.com>
+	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=UdKJC4Op
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail2; t=1795267873; x=1795527073;
+	bh=r0MMOix26sOHkfFFJ+zGS98rI+ooroQaiLjBZdvKtOc=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=UdKJC4OpGKs6IIj40qUl7G9xRz6bpqnKYpdEJBL679KzL6q7oRTAVIviMyVLuCJ0e
+	 qzxkHlCTMrMcPkb/YBZaks+sIgFzuQHakRfMx2k/LymNHpFRwrgYV4UTNTsLdr2Btu
+	 210nGAzbaT3+2Hqz0Jom5xkyC4FfZi9/dbFx6Oo1s6fS0LEY7EEdfYyROQvqXfs484
+	 Y603I57rR7SNu1edc304FGXLtwgo7ANRog86ZotTn+0fH6KJ4sxiPEPPqPUdz7T7FK
+	 /VagQ2sik5hVxezAGJVVH8FbAslOquSI3CJOPUJ1ib4D3yh8AX1hZ09ooppIi/89ef
+	 r8FaXwJeqiXNQ==
+Date: Sat, 21 Nov 2026 13:31:08 +0000
+To: alex.aring@gmail.com, stefan@datenfreihafen.org, miquel.raynal@bootlin.com
+From: Lee Keon-Hyeong <leegun25@proton.me>
+Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH net] mac802154: fix duplicate association handling
+Message-ID: <20261121133101.240921-1-leegun25@proton.me>
+Feedback-ID: 167971190:user:proton
+X-Pm-Message-ID: b887ac16e5f89a15f617a51968b25e1e49c49dbd
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Post: <mailto:linux-wpan@vger.kernel.org>
@@ -74,87 +61,71 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-wpan+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 20/11/2026 at 15:45:37 +07, Petr Vaganov <petrvaganoff@gmail.com> wrote:
+A retransmitted ASSOC REQ from an already known child is supposed to
+replace the old entry, but the lookup uses the new child's address mode.
+With alloc_addr=3D1 the new child has short-address mode and
+cfg802154_pan_device_is_matching() rejects short-mode queries, so the
+lookup never matches and every retransmission is appended as a new child,
+consuming an association slot and a short address.  With alloc_addr=3D0 the
+lookup matches, but the old entry is only list_del()'d without kfree(),
+leaking a kmalloc-32 object per retransmission, and nchildren is
+incremented again for the replacement.
 
-> During fuzz testing, the following issue was discovered:
->
-> BUG: KMSAN: uninit-value in ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:54 [inline]
-> BUG: KMSAN: uninit-value in ieee802154_hdr_push+0xa62/0xb20 net/ieee802154/header_ops.c:108
->  ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:54 [inline]
->  ieee802154_hdr_push+0xa62/0xb20 net/ieee802154/header_ops.c:108
->  ieee802154_header_create+0xa83/0xd20 net/mac802154/iface.c:396
->  wpan_dev_hard_header include/net/cfg802154.h:525 [inline]
->  dgram_sendmsg+0xc6d/0x15d0 net/ieee802154/socket.c:677
->  ieee802154_sock_sendmsg+0x8f/0xd0 net/ieee802154/socket.c:96
->  sock_sendmsg_nosec net/socket.c:711 [inline]
->  __sock_sendmsg+0x2f3/0x360 net/socket.c:726
->  ____sys_sendmsg+0x960/0xc30 net/socket.c:2581
->  ___sys_sendmsg+0x285/0x3e0 net/socket.c:2635
->  __sys_sendmmsg+0x33c/0x950 net/socket.c:2724
->  __do_sys_sendmmsg net/socket.c:2751 [inline]
->  __se_sys_sendmmsg net/socket.c:2748 [inline]
->  __x64_sys_sendmmsg+0xc6/0x150 net/socket.c:2748
->  x64_sys_call+0x12a8/0x3cf0 arch/x86/include/generated/asm/syscalls_64.h:308
->  do_syscall_x64 arch/x86/entry/common.c:47 [inline]
->  do_syscall_64+0xd9/0x1c0 arch/x86/entry/common.c:78
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
->
-> Uninit was stored to memory at:
->  ieee802154_hdr_push_sechdr net/ieee802154/header_ops.c:51 [inline]
->  ieee802154_hdr_push+0xa5b/0xb20 net/ieee802154/header_ops.c:108
->  ieee802154_header_create+0xa83/0xd20 net/mac802154/iface.c:396
->  wpan_dev_hard_header include/net/cfg802154.h:525 [inline]
->  dgram_sendmsg+0xc6d/0x15d0 net/ieee802154/socket.c:677
->  ieee802154_sock_sendmsg+0x8f/0xd0 net/ieee802154/socket.c:96
->  sock_sendmsg_nosec net/socket.c:711 [inline]
->  __sock_sendmsg+0x2f3/0x360 net/socket.c:726
->  ____sys_sendmsg+0x960/0xc30 net/socket.c:2581
->  ___sys_sendmsg+0x285/0x3e0 net/socket.c:2635
->  __sys_sendmmsg+0x33c/0x950 net/socket.c:2724
->  __do_sys_sendmmsg net/socket.c:2751 [inline]
->  __se_sys_sendmmsg net/socket.c:2748 [inline]
->  __x64_sys_sendmmsg+0xc6/0x150 net/socket.c:2748
->  x64_sys_call+0x12a8/0x3cf0 arch/x86/include/generated/asm/syscalls_64.h:310
->  do_syscall_x64 arch/x86/entry/common.c:47 [inline]
->  do_syscall_64+0xd9/0x1c0 arch/x86/entry/common.c:78
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
->
-> Both ieee802154_header_create() and mac802154_header_create() declare
-> struct ieee802154_hdr hdr on the stack and clear only hdr.fc via
-> memset. This leaves hdr.sec uninitialized.
->
-> There are two ways uninitialized hdr.sec fields can be read:
->
-> 1. ieee802154_header_create() had a pre-existing assignment:
->
->        hdr.fc.security_enabled = cb->secen;
->
->    This could set security_enabled = 1 from a stale cb->secen (e.g.,
->    after WPAN_SECURITY_ON followed by WPAN_SECURITY_DEFAULT), even when
->    mac802154_set_header_security() returns without initializing hdr.sec.
->    ieee802154_hdr_push_sechdr() would then read uninitialized hdr.sec.
->
-> 2. mac802154_set_header_security() never writes sec.frame_counter.
->    ieee802154_hdr_push_sechdr() copies it from the stack into the skb
->    before mac802154_llsec_encrypt() sets the real value. If encryption
->    fails, or via AF_PACKET taps in dev_queue_xmit_nit(), the
->    uninitialized bytes are exposed to userspace.
->
-> Fix both issues by replacing memset(&hdr.fc, ...) with
-> memset(&hdr, ...) in both functions, which zeros hdr.sec entirely
-> before mac802154_set_header_security() is called. The stale
-> hdr.fc.security_enabled assignment is also removed as it is now
-> superseded by the full zero-initialization.
->
-> Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
->
-> Closes: https://syzkaller.appspot.com/bug?extid=60a66d44892b66b56545
-> Closes: https://syzkaller.appspot.com/bug?id=23f21e76e9d2d1ed587cb5e71515260d6d025b63
-> Fixes: f30be4d53cad ("mac802154: integrate llsec with wpan devices")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Petr Vaganov <petrvaganoff@gmail.com>
+The ASSOC REQ source is always an extended address.  Look the existing
+child up by its extended address regardless of the short-address mode
+chosen for the new entry, free the replaced child, and count only
+genuinely new children.
 
-Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
+With max_associations=3D2, two association requests from the same peer
+exhaust all available slots and prevent another peer from associating.
+With alloc_addr=3D0, 300 repeated requests leak 300 kmalloc-32 objects and
+inflate nchildren; a subsequent disassociation leaves the counter
+inflated, and an interface down/up does not reset it.  Both behaviours
+were reproduced with a monitor/coordinator pair on mac802154_hwsim and
+are gone after this patch.
+
+Fixes: 601f160b61b2 ("mac802154: Handle association requests from peers")
+Signed-off-by: Lee Keon-Hyeong <leegun25@proton.me>
+---
+ net/mac802154/scan.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
+index d393b1f4e..ebef22e7e 100644
+--- a/net/mac802154/scan.c
++++ b/net/mac802154/scan.c
+@@ -879,19 +879,23 @@ int mac802154_process_association_req(struct ieee8021=
+54_sub_if_data *sdata,
+ =09=09"Successful association with new child %8phC\n", &ceaddr);
+=20
+ =09/* Ensure this child is not already associated (might happen due to
+-=09 * retransmissions), in this case drop the ex structure.
++=09 * retransmissions), in this case replace the ex structure.  The ASSOC
++=09 * REQ source is always an extended address, so look the child up by it
++=09 * regardless of the short address mode chosen for the new entry.
+ =09 */
+-=09tmp.mode =3D child->mode;
++=09tmp.mode =3D IEEE802154_EXTENDED_ADDRESSING;
+ =09tmp.extended_addr =3D child->extended_addr;
+ =09exchild =3D cfg802154_device_is_child(wpan_dev, &tmp);
+ =09if (exchild) {
+ =09=09dev_dbg(&sdata->dev->dev,
+ =09=09=09"Child %8phC was already known\n", &ceaddr);
+ =09=09list_del(&exchild->node);
++=09=09kfree(exchild);
++=09} else {
++=09=09wpan_dev->nchildren++;
+ =09}
+=20
+ =09list_add(&child->node, &wpan_dev->children);
+-=09wpan_dev->nchildren++;
+=20
+ unlock:
+ =09mutex_unlock(&wpan_dev->association_lock);
+--=20
+2.55.0
+
+
