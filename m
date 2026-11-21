@@ -1,57 +1,57 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.103
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=100.103.45.18
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795267878;
-	b=jfhO+biiE5g+GRKEgdOKzCt/rnZ/IX137o+LIUnjW3JEeWeIatDS7vLyirldLub9NOnj
-	 9GOzbIS93X1FCLz51fPP7x9ATfGixpOGp8GttzBJ+TCBxjKZkRfidr3mJ6MTaJd42L7oL
-	 LYcE68W0BZQ8IffY1dCpcATXk0Juc7vM712HoKXn0XBb9mCYALL5PZFOQRLBLCw6peV2F
-	 EdiQ+WK8SFTbeJ5OmovHcB8r8XJQ06lZWlY3+ZXG995YvNO8MdfNAxjtE0ymD1S1IWtFF
-	 Wh7Vn3KDZxPbW7oZXG2c4wlTC/9Io2Z+fDpwUlUl6NaVUSJLliOp+EJEpbXpx6pcsng==
+	t=1795267919;
+	b=pVgqQTQ2vajX9pANnhkxptW55FZUWGyriE1DwUkvOYmevwDXoVPLOT8R7R93n+XU7/fo
+	 bwg7ajA+sYApEzRAv0hwlbtIM0Vn9ndUX4uBHhdgXpNuXIsTgvR7wZdM8boz0pmKjZZ4v
+	 r8bWp3NJTHTEWBK18PLdXGncHCBYBYwniCQalnl0bFJQHn7CwzbPtYVlO+Un2YKSv4WFk
+	 n2bBkcScaDL12Zd9J0uaGnY0fY1NBtpPpx6HXBtDNJqkWq0sN8ZGhCMbjQXBck/beFV4D
+	 NVJKX0MXX9ajr5vZH6JkqULJ5XvZjv+E6f5WOcJc+9Z4wzHsaOvPaw8RW+UjfK9s57g==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795267878;
-	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
-	 Feedback-ID:X-Pm-Message-ID:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding;
-	bh=r0MMOix26sOHkfFFJ+zGS98rI+ooroQaiLjBZdvKtOc=;
-	b=2x7LqMVQbpeJJcgc7EktjjJRPCLubzjmy2UgA569MI+fTfeCLyvjFtCtpnf6w+4PlR+e
-	 mhc+aOT6IzH0nMC85PATYaLz3T+mojdgzCidRItLRrNMufCGgkXVnM9Uvf4OB/XjV2Vp3
-	 015rdjCCJgMpkxx1lyjriIGA69na3MGcG801tru4KkdLmiGeAH5oKWNS/zExlF3IXPEde
-	 BTe3A4ArgcGgje/45c68V9z6+bdsd6PMrGEYWnQnUKhlR9Db1dwL857MbNCONYniODFPr
-	 0xirsUHmTzC0A0sTHtJRNpdsVAciTceE35ZVgNI4v4wHJK1RzRDqQtYbxhV2096wcNw==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795267919;
+	h=Received:DKIM-Signature:From:To:Cc:Subject:Date:Message-ID:
+	 In-Reply-To:References:Auto-Submitted:Content-Type:
+	 Content-Transfer-Encoding:MIME-Version;
+	bh=sS9FIrfW22SIhehTvpH3rdvmtslwIeEYozBr0OvaZe8=;
+	b=Wk0zObl8wRUHDRi5zjx+Z/1qnEvhFT9oAzEHyM0+5233BZnlwlwqLMx0xQfQhAPDGuId
+	 FKSToMrWu9jeCdqkTaeA1skO7G8DZ747udcZ7ixXnW28iBAw94Wzn4T5kfS1Aihc6v5lc
+	 MjehM98QyjQ/BJEsh5BPqxXxY7i7Ko8ilF5YZO8PVz+iDN7RNVvQ4sJNBzQ0mvpgoC2As
+	 6R+oXfAV+lHfRkt/Es9lq6iCEaAl8/exkSI4uAO+0bz29MMZBitZwfsnWsMqf1LPK1ge/
+	 Sz4mmSgv6sFsNC/J3LCBwI/NsPNYxQDJ/yVHfAAF7e7IFXMnSNt5PMiUSfwgWGQCziA==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=proton.me;
-	spf=pass smtp.mailfrom=proton.me;
-	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=UdKJC4Op;
-	arc=none smtp.remote-ip=185.70.43.103
-Received: from mail-43103.protonmail.ch (mail-43103.protonmail.ch [185.70.43.103])
+	dkim=pass header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AN8fg0a0;
+	arc=none smtp.remote-ip=100.103.45.18
+Received: from smtp.kernel.org (quasi.space.kernel.org [100.103.45.18])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
+	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC89B606A320
-	for <linux-wpan@vger.kernel.org>; Sat, 21 Nov 2026 13:31:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org BC89B606A320
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0E91606A320;
+	Sat, 21 Nov 2026 13:31:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=UdKJC4Op
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail2; t=1795267873; x=1795527073;
-	bh=r0MMOix26sOHkfFFJ+zGS98rI+ooroQaiLjBZdvKtOc=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=UdKJC4OpGKs6IIj40qUl7G9xRz6bpqnKYpdEJBL679KzL6q7oRTAVIviMyVLuCJ0e
-	 qzxkHlCTMrMcPkb/YBZaks+sIgFzuQHakRfMx2k/LymNHpFRwrgYV4UTNTsLdr2Btu
-	 210nGAzbaT3+2Hqz0Jom5xkyC4FfZi9/dbFx6Oo1s6fS0LEY7EEdfYyROQvqXfs484
-	 Y603I57rR7SNu1edc304FGXLtwgo7ANRog86ZotTn+0fH6KJ4sxiPEPPqPUdz7T7FK
-	 /VagQ2sik5hVxezAGJVVH8FbAslOquSI3CJOPUJ1ib4D3yh8AX1hZ09ooppIi/89ef
-	 r8FaXwJeqiXNQ==
-Date: Sat, 21 Nov 2026 13:31:08 +0000
-To: alex.aring@gmail.com, stefan@datenfreihafen.org, miquel.raynal@bootlin.com
-From: Lee Keon-Hyeong <leegun25@proton.me>
-Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH net] mac802154: fix duplicate association handling
-Message-ID: <20261121133101.240921-1-leegun25@proton.me>
-Feedback-ID: 167971190:user:proton
-X-Pm-Message-ID: b887ac16e5f89a15f617a51968b25e1e49c49dbd
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.a=rsa-sha256 header.s=k20260515 header.b=AN8fg0a0
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38D841F000C4;
+	Sat, 21 Nov 2026 13:31:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kernel.org;
+	s=k20260515; t=1795267918;
+	bh=sS9FIrfW22SIhehTvpH3rdvmtslwIeEYozBr0OvaZe8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=AN8fg0a0rNgxCVyj09uAIbl1T6EZsJl+C2dB+l0A2ietU7ITH5zOW3vKi+pwwk1Ss
+	 1laOxSjEthgJllhe7VzezkU6/eCzaGXgm8GkpmO0OeYIoVomJIMRssmThx5sAAvfbV
+	 9LOhebrrq1Vb7Map6OoKOeycrsQE5btE8Pkq39FR/NzqjaRbtQ655HO2Uq9lF7+CNN
+	 rCq+wuhRqLaYV2QUh9oJ5bEebarQiz7iJejMKEneUATKfPpu0ESHZ3wYcya4LBkuB3
+	 sIk9T+WxkkdIPO0hMm+7ikrjzNvd/GZgrgqj12BXSMA1BFUoN/cKvYRmi2z1qBf5ZD
+	 1XsUE5So0Cocw==
+From: netdev-bot+sinfo@kernel.org
+To: Lee Keon-Hyeong <leegun25@proton.me>
+Cc: alex.aring@gmail.com, stefan@datenfreihafen.org, miquel.raynal@bootlin.com,
+ linux-wpan@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net] mac802154: fix duplicate association handling
+Date: Sat, 21 Nov 2026 13:31:57 +0000
+Message-ID: <179526791776.3294.14103729218391473997@kernel.org>
+In-Reply-To: <20261121133101.240921-1-leegun25@proton.me>
+References: <20261121133101.240921-1-leegun25@proton.me>
+Auto-Submitted: auto-generated
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Post: <mailto:linux-wpan@vger.kernel.org>
@@ -61,71 +61,22 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-wpan+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-A retransmitted ASSOC REQ from an already known child is supposed to
-replace the old entry, but the lookup uses the new child's address mode.
-With alloc_addr=3D1 the new child has short-address mode and
-cfg802154_pan_device_is_matching() rejects short-mode queries, so the
-lookup never matches and every retransmission is appended as a new child,
-consuming an association slot and a short address.  With alloc_addr=3D0 the
-lookup matches, but the old entry is only list_del()'d without kfree(),
-leaking a kmalloc-32 object per retransmission, and nchildren is
-incremented again for the replacement.
+Hi!
 
-The ASSOC REQ source is always an extended address.  Look the existing
-child up by its extended address regardless of the short-address mode
-chosen for the new entry, free the replaced child, and count only
-genuinely new children.
+This is an automated message. This series looks like a fix, but its
+commit messages seem to be missing some information:
 
-With max_associations=3D2, two association requests from the same peer
-exhaust all available slots and prevent another peer from associating.
-With alloc_addr=3D0, 300 repeated requests leak 300 kmalloc-32 objects and
-inflate nchildren; a subsequent disassociation leaves the counter
-inflated, and an interface down/up does not reset it.  Both behaviours
-were reproduced with a monitor/coordinator pair on mac802154_hwsim and
-are gone after this patch.
+ - How the issue was discovered, e.g. hit in production, hit during
+   development, syzbot report, manual code inspection, LLM or static
+   analysis tool scan.
 
-Fixes: 601f160b61b2 ("mac802154: Handle association requests from peers")
-Signed-off-by: Lee Keon-Hyeong <leegun25@proton.me>
----
- net/mac802154/scan.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+Please do not repost the series just to address the above. Instead,
+reply to this email with the missing information, so that reviewers
+can take it into account.
 
-diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
-index d393b1f4e..ebef22e7e 100644
---- a/net/mac802154/scan.c
-+++ b/net/mac802154/scan.c
-@@ -879,19 +879,23 @@ int mac802154_process_association_req(struct ieee8021=
-54_sub_if_data *sdata,
- =09=09"Successful association with new child %8phC\n", &ceaddr);
-=20
- =09/* Ensure this child is not already associated (might happen due to
--=09 * retransmissions), in this case drop the ex structure.
-+=09 * retransmissions), in this case replace the ex structure.  The ASSOC
-+=09 * REQ source is always an extended address, so look the child up by it
-+=09 * regardless of the short address mode chosen for the new entry.
- =09 */
--=09tmp.mode =3D child->mode;
-+=09tmp.mode =3D IEEE802154_EXTENDED_ADDRESSING;
- =09tmp.extended_addr =3D child->extended_addr;
- =09exchild =3D cfg802154_device_is_child(wpan_dev, &tmp);
- =09if (exchild) {
- =09=09dev_dbg(&sdata->dev->dev,
- =09=09=09"Child %8phC was already known\n", &ceaddr);
- =09=09list_del(&exchild->node);
-+=09=09kfree(exchild);
-+=09} else {
-+=09=09wpan_dev->nchildren++;
- =09}
-=20
- =09list_add(&child->node, &wpan_dev->children);
--=09wpan_dev->nchildren++;
-=20
- unlock:
- =09mutex_unlock(&wpan_dev->association_lock);
---=20
-2.55.0
-
-
+*IMPORTANT*: If you do repost (for other reasons) - please include
+the relevant info in the cover letter or commit messages.
+-- 
+The evaluation is done by an LLM so it may be wrong, if you think
+that is the case please reply and explain.
