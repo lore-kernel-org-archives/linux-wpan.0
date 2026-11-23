@@ -1,65 +1,60 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.70.43.22
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795423720;
-	b=QNW8lB4iHf34risI+6SaTjAciuvQPgL9Hw670jvVVW5WotKu73wIwwgLhI3ODSpi1Cck
-	 afttHYknlDasfJ7M+j5fYoNVnHxtolm68bgLoMjn9dLVfN9WqawBKEk9dakcxPZdmOESy
-	 DIRXvyMZrMlyOhEFb3HczY1AN0KH7Ya9SL+Vy+nuTtNe07gCaMHEERDx1PjMN3mDMVkZA
-	 cwkPq113NT7WG9GmJTtStV5D5DuZ3D43FvnFmCIfJhDPRGHlhyks69DscS1/gVabCEv3D
-	 1vDZ+k6qBzapMU+2NcxyPG74XdyMcbKvntDGkbSHCnzo55V5la+8nzmB313pTk5gnpg==
+	t=1795441338;
+	b=qNKolRcziIsmtcPhjFbRHpPvUMYX6leMxLhgnmFCAMp0aMFqPB6idWe3nWZMdVZSw/xx
+	 /miwdMBvAci+lTQ31+i5+0K4sUOGDvT8J1B9a0hmH2XXVxEuj7tXa8hbgMUtkPwHnxaQL
+	 RSx2LWcpEhanLdJJOPP4y6Zdlv/YJTinBnoD+rjE0EvH3fkIc2NJiIPFIzBGJfMIbQX7Q
+	 UDD+DbH0LDGj0kFa/fo6csGLIPXZV+7E8DSq5JOI3EuoTjHOMT9jX0/9bmlm9jkq64oFl
+	 JRLurpTAtxJ/814BKvFXZeaCrXxqyCh5yDEPjztL35prz3BWJGOGsn5dSIhGOxj9EAA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795423720;
-	h=DMARC-Filter:Received:Received:Received:DKIM-Signature:From:To:Cc:
-	 Subject:In-Reply-To:References:User-Agent:Date:Message-ID:
-	 MIME-Version:Content-Type:X-Last-TLS-Session-Version;
-	bh=gxoYopGv36PrxSuDkesKkqjNJ9M5btJr5MGzOubEhE0=;
-	b=PEdTuMZxKlEUH3D+HoYPLuBAEhDNEkyMa+foB55cwsPjzDuWfq189QajZAIjMb1+9Z5H
-	 tqUtBeDJlVsW4g/q49ilY8XZc8ogxYQ/6m01JmnmoJmuj/IxbPXj/BMxXvkDIyEvkoI6v
-	 8cMK0mKV3qf/8sktpQwN4xuuiVHwwbAXPAwkRGtSSCa6fW+m8+xJ06wOqFkmAIwZJWwQq
-	 +0XTsG0WwmTLjJi+VEYQazK/t5J9J3fqX7Mf/46Sg1ckbJB+lBnYOxjOc14xZxcTYL3yG
-	 BQTdX7cySPjnkZYn7gK+SofSjfGGvC1bpvvTdhjf2l7Uaa4wOCZz9Dwhe4DHE99dmrg==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795441338;
+	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
+	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding;
+	bh=/59dkLXw7fWA0046VR7tU5oUR0oxbfp1PkFwPJklpDE=;
+	b=o2nNkljgbDaVUSZzGo25Q156yK6/KAHHPhtoVQWKi2xYPnucOEoTVdk0N4B5Zp7KE2Ne
+	 HZD81tvJHmfZsGxB1tVhaC/AN3whvIV0aXnMPjrzder/uPhsmUL7askHKT9d2Dvd3nQWw
+	 J3H0vP4SLq6W2i0uANyN8XLAywloMP7NyEirwANy9dvglnhmFtmn6n+ComR9Z3Ad+3Gyf
+	 ivk1SDuyGEcY13fJBBvYyn6pR9pybxNM4YGMTefgvDlJ6GwomZ2qU3WddhF7HOwr5JQbZ
+	 4GXOiFyiAuAqUVxOsvK6rp6q6Kol+FUL4UQXicEpXwKRBTfk9IfEt1nDvNRGiNJmfHg==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=bootlin.com;
-	spf=pass smtp.mailfrom=bootlin.com;
-	dkim=pass header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=d6RB14i4;
-	arc=none smtp.remote-ip=185.246.84.56
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+	dmarc=pass header.from=protonmail.com;
+	spf=pass smtp.mailfrom=protonmail.com;
+	dkim=pass header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b=OiIDMKGV;
+	arc=none smtp.remote-ip=185.70.43.22
+Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11941606A31F;
-	Mon, 23 Nov 2026 08:48:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 11941606A31F
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 608F8606A338;
+	Mon, 23 Nov 2026 13:42:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 608F8606A338
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=d6RB14i4
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 47A781A17B1;
-	Mon, 23 Nov 2026 08:48:37 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 137125FAEB;
-	Mon, 23 Nov 2026 08:48:37 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 4E3FC11E68739;
-	Mon, 23 Nov 2026 09:48:34 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1795423716; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=gxoYopGv36PrxSuDkesKkqjNJ9M5btJr5MGzOubEhE0=;
-	b=d6RB14i4DdcicrUpKqHgnXA999geC/VvzPSth5X6vIzaCmnhxdWmUa4rsmGCGoYBr8XR0l
-	b3WwuSXEfKjir3yszUaeYqNhq3JadTsVzS6xgt4UcL6H3CU3kqlPASi+ypo5FBovcLvJJT
-	60/Z/PUFjGldNrJxWrgkmBBsc5DJNXENylCH1iO421hUdUt+Kkt+TvxhX67vhVITpkCmcG
-	erGGzo7swHPvFyQ02Y13hJervV/5w6LcrIUfNX5S4UVEDe3akGzUO2r00TcFZzoZ0NUg+P
-	1jNcCZZbTIWRryuLusDj6gOJFik3xKDrnGhoYalMAZfmDawnQKszLMS4MpL6Xg==
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Lee Keon-Hyeong <leegun25@proton.me>
-Cc: alex.aring@gmail.com,  stefan@datenfreihafen.org,
-  linux-wpan@vger.kernel.org,  netdev@vger.kernel.org
-Subject: Re: [PATCH net] mac802154: fix duplicate association handling
-In-Reply-To: <20261121133101.240921-1-leegun25@proton.me> (Lee Keon-Hyeong's
-	message of "Sat, 21 Nov 2026 13:31:08 +0000")
-References: <20261121133101.240921-1-leegun25@proton.me>
-User-Agent: mu4e 1.12.12; emacs 30.2
-Date: Mon, 23 Nov 2026 09:48:34 +0100
-Message-ID: <87se0sue59.fsf@bootlin.com>
+	dkim=pass (2048-bit key, unprotected) header.d=protonmail.com header.i=@protonmail.com header.a=rsa-sha256 header.s=protonmail3 header.b=OiIDMKGV
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+	s=protonmail3; t=1795441335; x=1795700535;
+	bh=/59dkLXw7fWA0046VR7tU5oUR0oxbfp1PkFwPJklpDE=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=OiIDMKGVPGqiHMt0HzbnYrdFL0Ix7mCahLPMEvDPzkejuUGRBSZGwJPyLYolIBJzJ
+	 WM21XyiQI21B+gdtd9OQBscSJaZgBARnfzHGd3BOexXcaQqJTp/rmU55AZt9Fk35+w
+	 uC07mDrLlOeSsxVtXV+86AXcTua7groW/t2H/RdAaI6jE25IOvhr7Hfr+DzZvhqey3
+	 hfWz6bkrwGn1wKG6nxAuIpvfUVGlKXNEuzpM4Vvka0hZ+dSb65oo0/0XzPAtKVFAgl
+	 r7HR+/G8FlDKfS/C8o8wwUPCykVEed4e6WXjVxaGp6N8wZNI5D8Lj4rSYJLWljjvBG
+	 Pmuk/rIMFjR5A==
+Date: Mon, 23 Nov 2026 13:42:08 +0000
+To: netdev-bot+sashiko@kernel.org
+From: Ryan Prinz <rc4d5a@protonmail.com>
+Cc: Alexander Aring <alex.aring@gmail.com>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@kernel.org>, Simon Horman <horms@kernel.org>, Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org, linux-wpan@vger.kernel.org, Miquel Raynal <miquel.raynal@bootlin.com>, netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Ryan Prinz <rc4d5a@protonmail.com>, Stefan Schmidt <stefan@datenfreihafen.org>
+Subject: Re: [PATCH net v2] ieee802154: 6lowpan: validate fragment offset against datagram size
+Message-ID: <20261123134144.1637522-1-rc4d5a@protonmail.com>
+In-Reply-To: <179484385868.3136.2031122352295651681@kernel.org>
+References: <20261112153034.1015181-1-rc4d5a@protonmail.com> <179484385868.3136.2031122352295651681@kernel.org>
+Feedback-ID: 190731814:user:proton
+X-Pm-Message-ID: a2e358e272c572a2df39823e2b2e87b4a279f6f9
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Post: <mailto:linux-wpan@vger.kernel.org>
@@ -69,78 +64,36 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-wpan+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi Lee,
+Thanks again, these are correct, and I've made the adjustments.
 
-On 21/11/2026 at 13:31:08 GMT, Lee Keon-Hyeong <leegun25@proton.me> wrote:
+- [High] Zero-length fragments: agreed, the new check doesn't reject
+  skb->len =3D=3D 0. lowpan_get_cb() only checks !skb->len on the FRAG1
+  branch, and that check runs before lowpan_rx_h_ipv6() pulls the
+  dispatch byte, so a FRAG1 whose only payload is that byte, or a
+  FRAGN carrying nothing but its header, both reach
+  lowpan_frag_queue() empty. Adding !skb->len to the bounds check, and
+  dropping the "a zero-length final fragment is accepted" wording from
+  the commit message. It shouldn't be accepted, and won't be.
 
-> A retransmitted ASSOC REQ from an already known child is supposed to
-> replace the old entry, but the lookup uses the new child's address mode.
-> With alloc_addr=1 the new child has short-address mode and
-> cfg802154_pan_device_is_matching() rejects short-mode queries, so the
-> lookup never matches and every retransmission is appended as a new child,
-> consuming an association slot and a short address.  With alloc_addr=0 the
-> lookup matches, but the old entry is only list_del()'d without kfree(),
-> leaking a kmalloc-32 object per retransmission, and nchildren is
-> incremented again for the replacement.
->
-> The ASSOC REQ source is always an extended address.  Look the existing
-> child up by its extended address regardless of the short-address mode
-> chosen for the new entry, free the replaced child, and count only
-> genuinely new children.
->
-> With max_associations=2, two association requests from the same peer
-> exhaust all available slots and prevent another peer from associating.
-> With alloc_addr=0, 300 repeated requests leak 300 kmalloc-32 objects and
-> inflate nchildren; a subsequent disassociation leaves the counter
-> inflated, and an interface down/up does not reset it.  Both behaviours
-> were reproduced with a monitor/coordinator pair on mac802154_hwsim and
-> are gone after this patch.
->
-> Fixes: 601f160b61b2 ("mac802154: Handle association requests from peers")
-> Signed-off-by: Lee Keon-Hyeong <leegun25@proton.me>
-> ---
->  net/mac802154/scan.c | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
->
-> diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
-> index d393b1f4e..ebef22e7e 100644
-> --- a/net/mac802154/scan.c
-> +++ b/net/mac802154/scan.c
-> @@ -879,19 +879,23 @@ int mac802154_process_association_req(struct ieee802154_sub_if_data *sdata,
->  		"Successful association with new child %8phC\n", &ceaddr);
->  
->  	/* Ensure this child is not already associated (might happen due to
-> -	 * retransmissions), in this case drop the ex structure.
-> +	 * retransmissions), in this case replace the ex structure.  The ASSOC
-> +	 * REQ source is always an extended address, so look the child up by it
-> +	 * regardless of the short address mode chosen for the new
->  	entry.
+- [Medium] Commit message mechanism: agreed, and it follows from your
+  next point. Reworded the impact description to stop asserting one
+  specific mechanism (the overlap-eviction splice), since that isn't
+  reliable given the issue below. The new wording just states what the
+  fix itself guarantees: no out-of-range or empty fragment is accepted
+  into the queue.
 
-Did you read back this comment and thought it was in any way useful?
-Please drop.
+- [High, pre-existing] end =3D d_size passed to inet_frag_queue_insert()
+  instead of the fragment's own offset + skb->len: confirmed by
+  tracing both of your examples against the actual insert logic. This
+  predates this patch and isn't something this bounds-check patch
+  should carry. I'm tracking it as a separate issue to address on its
+  own rather than folding it in here.
 
->  	 */
-> -	tmp.mode = child->mode;
-> +	tmp.mode = IEEE802154_EXTENDED_ADDRESSING;
+v4 incoming with the zero-length check added and the commit message
+reworded to not overstate the mechanism.
 
-This is probably fine but an orthogonal change, so a separate patch, no?
+pw-bot: cr
 
->  	tmp.extended_addr = child->extended_addr;
->  	exchild = cfg802154_device_is_child(wpan_dev, &tmp);
->  	if (exchild) {
->  		dev_dbg(&sdata->dev->dev,
->  			"Child %8phC was already known\n", &ceaddr);
->  		list_del(&exchild->node);
-> +		kfree(exchild);
-> +	} else {
-> +		wpan_dev->nchildren++;
->  	}
->  
->  	list_add(&child->node, &wpan_dev->children);
-> -	wpan_dev->nchildren++;
->  
->  unlock:
->  	mutex_unlock(&wpan_dev->association_lock);
