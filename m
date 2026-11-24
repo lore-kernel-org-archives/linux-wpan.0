@@ -1,60 +1,67 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=79.135.106.119
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.171.202.116
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795510767;
-	b=xbRDKZ8Whkgt8K/kp3tsnKqH92WRnpwmPo9bropf3mxS8dNXiWltZA81PP28TmlRA5i5
-	 RdV1HJoihEO7pjyh+pWcXhEDwhta6HAhPuPuhRWM3UV4kYl4AAc5I961mj1stiON8Z6Bf
-	 QIG2sdswdJvkDykNKLVmw73lU/wG6UkcYHwQWUacHRYMbz+ZEqRxvlh76KTbwWJxSvgKS
-	 7ZGtC2KajV+8tAoYijQ4azL3pzm0IPp0He5BDcP7iiQQeiaoDIu3vwcojC0leb/aYJIyX
-	 ZDp1NnL1nJOQyxWEJMfq6/EWJUoi6/reP/I+4uea7WnP8OXL0dXaSui6V+gEagdpjnA==
+	t=1795546096;
+	b=W4Xk4SxFxXXTgLtnycIiKq2d9go6vHdznlRz0ZxaUWFGLs94aP2ESV+FYRHO930Dvfr4
+	 07b91nf6bY9DvWz1wdu3eyyDOInndnHG5+QGJpV+qenMwhwdymEjX+yGH9ELlRSy5d0+A
+	 ComUxQPpJYNDnPo5JbWPOeNCR0b9ZvBSTl1Ho+hUZBZh30EjaT/WgK5JZYwpjeqRcwXxd
+	 ooY8EvN3iP3DdoP6TVtF+P7g8ryAbb5lpxH0xKReZGHPVLGpeg8tF2F8B/Kj06GhQ6G49
+	 BIOBUevmRj5JPirD1NAVvKw5yHdEYhj0sPDvFjSovBZjRzENMFwZnMk5QAk3Z4x19sQ==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795510767;
-	h=DMARC-Filter:DKIM-Signature:Date:To:From:Cc:Subject:Message-ID:
-	 In-Reply-To:References:Feedback-ID:X-Pm-Message-ID:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding;
-	bh=lIYZVD2078uZopDO/+14qXWFBtXrBaP8RVS/8lfqMXU=;
-	b=PtW8GXg4F42/g6q0x0BbemcbOH68EcAZSG6QRkye77M2/UOAZvI76lMTgHijdicKzZKA
-	 +V93vGkJq1jkrr8noTfcQ0QZ6UgR+8fuYLWfo9PZ22dcrclwrko+krET2adu9Z640zmX8
-	 Rerpb5qqzXoPTjNtF2ZSIY7zPk3xoA1FIptFuFT29DhwVnFTfhXc3aXG/SdmKj1X+A73q
-	 QKAZdNo/p/rNpb+LinQBZJ9+EZKjausNM+rrlzjz2XbertLJQxwhXYE7rgDF/gWneRBRp
-	 ZzOaV0GxW2GM1zbcpShryr0Xdy6qg59zzNG515yWRRME159wE/WiuddzMumiXKIQAnA==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795546096;
+	h=DMARC-Filter:Received:Received:Received:DKIM-Signature:From:To:Cc:
+	 Subject:In-Reply-To:References:User-Agent:Date:Message-ID:
+	 MIME-Version:Content-Type:Content-Transfer-Encoding:
+	 X-Last-TLS-Session-Version;
+	bh=XBzDKPy8F5atVthy1/b+yB4P2BpBTE8nfPxwYLvRUlA=;
+	b=UBkAZgAJOzh6rNLxHtGavs6C4c38OgR4NnTHCH/wC3n1tFZnTSN9j/N0Wg5+Ie21+KRy
+	 Nai3eS4c4McAztAXRzzbWJCwpXlFuU06ETDN1F/+8SWCxMDG9KuoORdxkkSr1fVmRZhHj
+	 EGyADgrc/WMdSizu1Wk63mfK6tcP+N2D/qDhL4fVbZGcCwxpirzYMoCJr1pavAYFk+Vv5
+	 1gyjW2FFhWCBOXfUGdWUay/O/PCkZse/1tfp0uIVHAkxQrNP9jZM+wXr4rbk18dDQOhle
+	 m8DzifU1UFmS8/pB0zrAfA3GhF4aDvDO2eQpzmfY4GL+GUzRpi4Q14h1NkVbocQSwVQ==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=proton.me;
-	spf=pass smtp.mailfrom=proton.me;
-	dkim=pass header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=eXTyMtFV;
-	arc=none smtp.remote-ip=79.135.106.119
-Received: from mail-106119.protonmail.ch (mail-106119.protonmail.ch [79.135.106.119])
+	dmarc=pass header.from=bootlin.com;
+	spf=pass smtp.mailfrom=bootlin.com;
+	dkim=pass header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=oSOHBSUB;
+	arc=none smtp.remote-ip=185.171.202.116
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0B07606A322
-	for <linux-wpan@vger.kernel.org>; Tue, 24 Nov 2026 08:59:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org E0B07606A322
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B12F606A321
+	for <linux-wpan@vger.kernel.org>; Tue, 24 Nov 2026 18:48:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 8B12F606A321
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key, unprotected) header.d=proton.me header.i=@proton.me header.a=rsa-sha256 header.s=protonmail2 header.b=eXTyMtFV
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail2; t=1795510764; x=1795769964;
-	bh=lIYZVD2078uZopDO/+14qXWFBtXrBaP8RVS/8lfqMXU=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=eXTyMtFVp/8473q7LhstWY1L18WZTIkfr16cKhBzHTWJNRfxmrG/S4s8V5VhNPKIR
-	 24OoCy2c/o+PM05gd9LJsHUHNzCbxwtsuaNeVcX9iMGRdSz1knPzCQDXlKHevFc0JF
-	 hj+HvNOTzJJo+qTqHbGEId1DLBrr0QyfYkVBayeRJBKEzbOqjPKNLQnuwMTM5wLatH
-	 H3xSruJddpL6lGuhqICqkec6I1d+SPNCARjc9aRPN1a2gsHLxM/L9IPXzEfUScgAYY
-	 C2watanXv0R8gYvlYZ6EljNMfRF1zBsYJgWStHfhUZXM/lU5PSqFlSaqDYi0goXn1K
-	 d4PSjtrDjjULg==
-Date: Tue, 24 Nov 2026 08:59:21 +0000
-To: alex.aring@gmail.com, stefan@datenfreihafen.org, miquel.raynal@bootlin.com
-From: Lee Keon-Hyeong <leegun25@proton.me>
-Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH net v2 2/2] mac802154: look up children by extended address
-Message-ID: <20261124085905.710751-2-leegun25@proton.me>
-In-Reply-To: <20261124085905.710751-1-leegun25@proton.me>
-References: <20261124085905.710751-1-leegun25@proton.me>
-Feedback-ID: 167971190:user:proton
-X-Pm-Message-ID: ff6304ac1af91820a6186e6f7dbf0aee523bb094
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=oSOHBSUB
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 2BCF6C2BB32
+	for <linux-wpan@vger.kernel.org>; Tue, 24 Nov 2026 18:48:20 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 72EEA601E1;
+	Tue, 24 Nov 2026 18:48:12 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id EE0A311E69B24;
+	Tue, 24 Nov 2026 19:48:06 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1795546087; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=XBzDKPy8F5atVthy1/b+yB4P2BpBTE8nfPxwYLvRUlA=;
+	b=oSOHBSUBxG/QjZ8d8nZY+rHMg62PZfnFkOoAyjGxNqLMJuZfCyqHI9McElp46SpNSSqaem
+	Va7jzAdPY87J8Pd8Z9llt/kXToQTKuca0H9xXh609tDtMR2khrHponTR0SBDSq2IkeJOyM
+	gp58odi8NrnVa8l5SuMT0D0T8MoaKq9Whd2dv+94gfcUK00vQMw1GXLFuGNvIyz3ltUw2m
+	yueKJ2yhOvrmONqgECu9MD67dlg8hWVAbbXWpGe0qHwXr3d7M9HrP5EYzDsqZFt6qr6+dT
+	8tXA8xkHXu30ihBBreT/Kj6iEw7jC2rfqDYBk5IzA+vc8Qeb063fIIfJr2KJzw==
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Lee Keon-Hyeong <leegun25@proton.me>
+Cc: alex.aring@gmail.com,  stefan@datenfreihafen.org,
+  linux-wpan@vger.kernel.org,  netdev@vger.kernel.org
+Subject: Re: [PATCH net] mac802154: take RTNL around ASSOC RESP transmission
+In-Reply-To: <20261121150835.256812-1-leegun25@proton.me> (Lee Keon-Hyeong's
+	message of "Sat, 21 Nov 2026 15:08:43 +0000")
+References: <20261121150835.256812-1-leegun25@proton.me>
+User-Agent: mu4e 1.12.12; emacs 30.2
+Date: Tue, 24 Nov 2026 19:48:06 +0100
+Message-ID: <87se0qqd5l.fsf@bootlin.com>
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Post: <mailto:linux-wpan@vger.kernel.org>
@@ -66,51 +73,53 @@ Precedence: list
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-The source address of an ASSOC REQ is always an extended address, but
-mac802154_process_association_req() builds the lookup key with the
-address mode chosen for the new child.  With alloc_addr=3D1 the new child
-has short-address mode, and cfg802154_pan_device_is_matching() rejects
-short-mode queries, so the lookup never matches.  Every retransmission
-is then appended as a new child, consuming an association slot and a
-short address.
+On 21/11/2026 at 15:08:43 GMT, Lee Keon-Hyeong <leegun25@proton.me> wrote:
 
-Look up the existing child by its extended address.
+> mac802154_process_association_req() runs from the rx_mac_cmd workqueue.
+> The missing RTNL was identified during an LLM-assisted code audit of the
+> mac802154 association handling path.  The function builds the ASSOC RESP
+> and sends it through
+> mac802154_send_association_resp_locked() -> ieee802154_mlme_tx_locked(),
+> which asserts the RTNL and calls ieee802154_sync_queue().  The worker does
+> not hold the RTNL: this triggers an RTNL assertion failure whenever an
+> ASSOC REQ reaches the response transmission path.  With panic_on_warn=3D1=
+ a
+> single unauthenticated frame panics the kernel, even with
+> max_associations=3D0 (a rejected request still sends a response).
+>
+> Take the RTNL before association_lock, matching the netlink lock order
+> (RTNL then association_lock), and release it after the association lock on
+> all exits.
+>
+> Reproduced with a monitor/coordinator pair on mac802154_hwsim; the same
+> test is silent with this patch.  On a CONFIG_PROVE_LOCKING kernel 86,891
+> association requests were sent while the coordinator was brought down and
+> up 1,200 times and recreated 71 times: no lockdep report, no hang and no
+> warning, and the longest down transition took about 4 ms.  The
+> panic_on_warn run (22,941 requests, 300 down/up cycles) also completed.
+> There is no in-tree selftest for this path; the checks above use a
+> dedicated hwsim harness.
 
-With max_associations=3D2, two association requests from the same peer
-exhaust all available slots and prevent another peer from associating.
+Ok, we can definitely align on the observation but the approach may not
+stand.
 
-I found this during an LLM-assisted code review and reproduced it with
-mac802154_hwsim.
+First let's approach the numbers. 4ms is on a locally run simulator. You
+are fixing a subsystem that plays with radios. A physical IEEE802154
+radio would probably bring the usual bad case to > 100ms, and worth case
+would be above the 1s boundary. So taking the RTNL lock as you do it
+there would no longer warn in dev mode, but might lead to a DoS.
 
-In a separate mac802154_hwsim test, 64 requests from the same peer
-left 64 child entries on the unpatched kernel.  With both patches
-applied, the same test left one entry.  Kernel selftests were not run.
+Reviewing your patch makes me realize we do something even worse: up to
+10s waiting with the RTNL when waiting for an association response (for
+which we are ouselves the initiator). That is slightly less a problem
+since it is not remotely triggerable like the approach you propose, but
+still.
 
-Fixes: 601f160b61b2 ("mac802154: Handle association requests from peers")
-Signed-off-by: Lee Keon-Hyeong <leegun25@proton.me>
----
-v2: Drop the added comment and move the lookup fix to patch 2/2.
-v1: https://lore.kernel.org/r/20261121133101.240921-1-leegun25@proton.me
+I don't remember why we *had* to take the RTNL in the mlme_tx path.
 
- net/mac802154/scan.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Alex, maybe you remember why?
 
-diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
-index 943641702646..6158ef41c0e0 100644
---- a/net/mac802154/scan.c
-+++ b/net/mac802154/scan.c
-@@ -881,7 +881,7 @@ int mac802154_process_association_req(struct ieee802154=
-_sub_if_data *sdata,
- =09/* Ensure this child is not already associated (might happen due to
- =09 * retransmissions), in this case drop the ex structure.
- =09 */
--=09tmp.mode =3D child->mode;
-+=09tmp.mode =3D IEEE802154_EXTENDED_ADDRESSING;
- =09tmp.extended_addr =3D child->extended_addr;
- =09exchild =3D cfg802154_device_is_child(wpan_dev, &tmp);
- =09if (exchild) {
---=20
-2.56.0
-
-
+Thanks,
+Miqu=C3=A8l
