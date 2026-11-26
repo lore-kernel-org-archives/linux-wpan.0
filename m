@@ -1,22 +1,22 @@
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=78.47.171.185
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795685053;
-	b=wlC2vGmV02zopNbMKWXlibcccwYRCtolpocYcd7Xhqmky1uqNnUmLpfPwXwnoMS6aEbF
-	 WtXbHutP9Dj1vTv5ZDY1ewreOW1DABoaH/RkvLXI3d/oytFCLoivkhI//D2itB9ZZQ3qy
-	 PhDuIGJHZ/TTc2NGw3lxiz9bgsaDMQm3NE/4DSv3Bz3vMbErXfz216n1fX4tuBxIR0O8/
-	 CSxIudo4H/pJ/rAXWG4Ur1tONfv6DWyibS3vKB4jaK5L/4d1aqHQhBGwP0Rvv25P28ZXr
-	 e6ZwkPVxGbjjcif/0CyEaAkAv4NsyjDRjbfl6NCPK4f5YGBNkRjSWjrpQIXmHZdqDPQ==
+	t=1795685458;
+	b=O5HdfgXm/dCZlTdOnn94pP8HF+uY9JSvSZOosVeTR1hGwrysv1KBfSMkJ54+ZhJPwLZH
+	 1o3gxlkvrIYjodRTwfpZhX4TP3Y/CAGJEwRa0LZBkjXl/7WNdIEW46dh+zOBjmbX05b85
+	 IILuflUaKyjCf26pY1HtPICJZfsjBSUK1jvqy9lLez1ULPCQcC5bnf/6ZVCYiBq+g58Qy
+	 R0gUweD7ntIcwM+raKki7fVm0cqQoKypR4fXG3lDJUcHriybqtiwlLeu/e6nJrk2mEdX5
+	 Wmdxz8mp/MQ7yE9Nz/NlWNdMgiujOb2NvATs/u1kWelTGHn6FLXgBsyVfC+oWT+tP6Q==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795685053;
+	a=rsa-sha256; c=relaxed/relaxed; t=1795685458;
 	h=DMARC-Filter:Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
 	 In-Reply-To:References:MIME-Version:Content-Type:
 	 Content-Transfer-Encoding;
-	bh=98AuoaBy6scAqdpD1bFpY8R263vuCvhHxS6e/zP2npM=;
-	b=xTjQE0IKrkNipZUqajEbNVGXKP/+I3WVFmuxo5srmxHk2SGTtiD8SHcWTku+RI2soIl2
-	 Vq00QRLz20xbtE9OL2Wy2sWNrjRjmWzoEQCxo57MZAP6eT2uV3y9pFisD5oeYxg0rlYQn
-	 6RrSKhinijEiJ62ZTMI9Gk09odJ7u9Okvz+NAAZFokAoL5uZdYT9emlDeeb2Wt1oajbh4
-	 0FgD02eYMpw9uI59oGtwD4MXSkVRGmpw2Uemqs+TNUF1WySBNy85fN0lZ1+r+I89uAV7f
-	 XGx94FkRLouYmp97QfHe3g8DHSbRyDKIk4LYCKIwqH7vS087zF2cuRV23DP9BUsQj1w==
+	bh=476RQ3GYG4okDny442A7f62x9RH8CtxwgL2Y5IQAN4I=;
+	b=Sl9ckr4+eVApRe10/BxC1nbDQCbibfkyBO34p2vzAko60dGcFo2hh68zKay6cz5PdI/X
+	 7avPhK8WLgWFq4cbO0fRpEWudTxF6BFlmJgJHEK3+w3KTIqDl0sJzXnKshM3jBcIdaiB1
+	 QlT7DsjOOWHRq7oy3nLWH/mKzj4ghZKwSvPGjor0L8dQ5lanf4REoatIE3op88FP3qfkK
+	 omj/MLfw/GT7f26osZ4GBK05f4m/D1LAUpTChNfsSP2YukhenGTP68IkZB6YfC4eEYNiS
+	 N0D+sNYhgSXUVop/Jnc2r7Sis9fd+WYiLNtTizVaTbLcRLl6AQ/998mkNLQgoGA+T7w==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
 	dmarc=none header.from=datenfreihafen.org;
 	spf=pass smtp.mailfrom=datenfreihafen.org;
@@ -25,9 +25,9 @@ Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76BEA606A31C;
-	Thu, 26 Nov 2026 09:24:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 76BEA606A31C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9486A606A31C;
+	Thu, 26 Nov 2026 09:30:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9486A606A31C
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
 Received: from work.datenfreihafen.local (unknown [46.253.254.165])
@@ -35,29 +35,27 @@ Received: from work.datenfreihafen.local (unknown [46.253.254.165])
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: stefan@sostec.de)
-	by proxima.lasnet.de (Postfix) with ESMTPSA id EFA8AC02DA;
-	Thu, 26 Nov 2026 10:24:10 +0100 (CET)
+	by proxima.lasnet.de (Postfix) with ESMTPSA id 63EC7C04A3;
+	Thu, 26 Nov 2026 10:30:55 +0100 (CET)
 From: Stefan Schmidt <stefan@datenfreihafen.org>
-To: linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Yifan Zhang <yfzhang23@stu.pku.edu.cn>
+To: Alexander Aring <alex.aring@gmail.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Andrey Misiurov <amisiurov@cloudlinux.com>
 Cc: Stefan Schmidt <stefan@datenfreihafen.org>,
-	alex.aring@gmail.com,
-	miquel.raynal@bootlin.com,
-	davem@davemloft.net,
-	edumazet@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	zihanx@nebusec.ai,
-	stable@vger.kernel.org,
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v3] mac802154: validate pinned interface before beacon transmission
-Date: Thu, 26 Nov 2026 10:24:06 +0100
-Message-ID: <179568504196.1941682.10640221246377134318.b4-ty@datenfreihafen.org>
+Subject: Re: [PATCH net v2] ieee802154: keep the original error after a netns rollback
+Date: Thu, 26 Nov 2026 10:30:50 +0100
+Message-ID: <179568544756.1950988.3201920280564563921.b4-ty@datenfreihafen.org>
 X-Mailer: git-send-email 2.56.1
-In-Reply-To: <179378621331.55520.8126896786309171541@stu.pku.edu.cn>
-References: <179337523079.51423.6573078122047317758@stu.pku.edu.cn> <179378621331.55520.8126896786309171541@stu.pku.edu.cn>
+In-Reply-To: <20261120065750.3274661-1-amisiurov@cloudlinux.com>
+References: <20261120065750.3274661-1-amisiurov@cloudlinux.com>
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Post: <mailto:linux-wpan@vger.kernel.org>
@@ -70,26 +68,24 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-Hello Yifan Zhang.
+Hello Andrey Misiurov.
 
-On Wed, 04 Nov 2026 17:56:53 +0800, Yifan Zhang wrote:
-> mac802154_beacon_worker() selects a beacon request under RCU and pins
-> the corresponding netdev before dropping the read lock.  The transmit
-> helper used to read the request again, so a concurrent interface switch
-> could make it dereference an unpinned netdev.
+On Fri, 20 Nov 2026 07:57:49 +0100, Andrey Misiurov wrote:
+> cfg802154_switch_netns() moves all of a phy's netdevs into a new netns. If
+> one move fails, it jumps to the errout label and moves the already-moved
+> netdevs back to the old netns.
 > 
-> Use the pinned wpan_dev throughout transmission.  Under RTNL, verify that
-> the request still belongs to that interface and that the interface is
-> running.  Build the beacon from the protected template while still
-> holding RTNL, then hand it to the locked MLME transmit helper.  Free the
-> skb only on errors before that handoff.
+> That rollback loop overwrites the same 'err' variable with the result of
+> each move-back. The move-backs succeed, so 'err' ends up 0 and the function
+> returns 0 -- success -- even though nothing moved and the phy stayed in the
+> old netns. nl802154_wpan_phy_netns() then tells userspace the move worked.
 > 
 > [...]
 
 Applied to wpan/wpan.git, thanks!
 
-[1/1] mac802154: validate pinned interface before beacon transmission
-      https://git.kernel.org/wpan/wpan/c/95f866334454
+[1/1] ieee802154: keep the original error after a netns rollback
+      https://git.kernel.org/wpan/wpan/c/006dfe9c1d68
 
 regards,
 Stefan Schmidt
