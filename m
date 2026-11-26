@@ -1,70 +1,53 @@
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.remote-ip=78.47.171.185
 ARC-Seal: i=1; d=subspace.kernel.org; s=arc20261015; a=rsa-sha256; cv=none;
-	t=1795691115;
-	b=as3hqJvlr0ydwRR1uO7pM7suvX3yzypqfeZELEBpuxIj8+d97+t0iQOV6Ulpb86gqN/J
-	 LioLlGrjIQh7f7fJ2/WGQ8hmQyjxRvRonP1hMBVEqE/AGB7tefxnfL4QswpG78I3vhEDL
-	 xsgmBiky6hM6JhRtww3OC4GHkxYrI1ZzPl0hhpXx0Tsy1LczTZLm/09c/oekSASSxvXQV
-	 ng6CvWC7txzmKWzJcmfWbTH0/t97/Gv4xN3BZGSb8fEJNW53izKv5YHKYh4n/al/9DnYV
-	 vpoindxG4U81bdm8HnkoEmQwJGqbQOWcKnRjCV500gO3AYPrPyehvKr9QgAB6HEc0WA==
+	t=1795693438;
+	b=no8BdDhRJ0/AiciOEPw0e6MS+2CsiwXhU6ULIR3IfkHQKiKaXXZaU1Qy4cpXfdYGyej3
+	 woHApCWwMoXi0Zbuqfv3T+kEQlTgB1qLTSLukNF2G/CmAdWpQbHujLGva9TkGzmhf8isg
+	 K8Bdk81pH2VHCxHnDDrie0HEvPZ5jTG99rtG+lMqHJk9CvqCsFS6nJTXzgTZrBHdCqpLD
+	 +SMUQvza2bxc0jQ6pg3+zni4IVZpPRyYpgNd14S7wFxWEMbMk+YPMrsSrbb2KHr0e+A2b
+	 r5YPGPnBRgw17e5AOuP6kYSRvHJOnKpDekBb042P6czf8xUEp0Rva2pDHDjV2GNcXJA==
 ARC-Message-Signature: i=1; d=subspace.kernel.org; s=arc20261015;
-	a=rsa-sha256; c=relaxed/relaxed; t=1795691115;
-	h=DMARC-Filter:Received:Received:Received:DKIM-Signature:From:To:Cc:
-	 Subject:In-Reply-To:References:User-Agent:Date:Message-ID:
-	 MIME-Version:Content-Type:Content-Transfer-Encoding:
-	 X-Last-TLS-Session-Version;
-	bh=HFXWiHAkj1wetLgDRhC5nOLmwHP9VaiX8muRd2DNVr0=;
-	b=qEjIJs00y7CAmUx7fFfFmnEFdvA2EqmaWIOAZE/wsnqsbZWdVLkKlSftDSMYCCEcIz8Z
-	 1/P+pS579r/8076M2XBbi0rgZJIEhRHL+19Tl0tItXfD0j/v28DtbeM2w3yOfdf0Ek6Br
-	 3m27o0PwQTFHzizLQw+sAwbhXB9nvYoHkI3oyexJBiyiJHUbLcNTE5QF4+2UZq05DpgBY
-	 1/9t0iHf+57W4+rEzUFkcxfae11rltbUOdvn+0gLOD4IK/aX6IWSbHmc4h7FDHQMJHNCU
-	 jhT9YV+I6v6lNFmowwrXx8Z7QVkpnleoGqRQcHHNqj46eNdR9FQpCqjjH4Dc5KDmLlQ==
+	a=rsa-sha256; c=relaxed/relaxed; t=1795693438;
+	h=DMARC-Filter:Received:From:To:Cc:Subject:Date:Message-ID:X-Mailer:
+	 MIME-Version:Content-Transfer-Encoding;
+	bh=iq7QWD1R6uTQhcWCLV3i7Z9S2aOBwDhRk26vX5a9zxE=;
+	b=0rjG/4JqcMndr+Uzac2SFN3280hlOWo3iv9VsTAbq1INEBv6lv6AMvKkgAdyYcBnZgAI
+	 cHi97ytPA6CG+jPu3k6M6uTXLssLXb8jOet6QzbFnb2aF0w4owhgJkSvJFjzoAYfyH4q2
+	 ZNlDhW8nyT1ta1PZ5DpYgRaeuw6cL9jLHqa4+bZwcHvNKPU2Agtp9ABChoIuvgAVjm7EJ
+	 DAnq70ZOIiCtxUiEZAwA+O7+7IfT3TXIqyE4jaV47bJrCBs2s1mWHXB6iMoS1utsDKBa3
+	 ipdODhVGxWlUx4J1+lRaNVxDQ69Fh7WbsEFs6JR9Vy4fpaWifXcVAqdj9Nikg9mp7Iw==
 ARC-Authentication-Results: i=1; smtp.subspace.kernel.org; 
-	dmarc=pass header.from=bootlin.com;
-	spf=pass smtp.mailfrom=bootlin.com;
-	dkim=pass header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=srQDhuHh;
-	arc=none smtp.remote-ip=185.246.85.4
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	dmarc=none header.from=datenfreihafen.org;
+	spf=pass smtp.mailfrom=datenfreihafen.org;
+	arc=none smtp.remote-ip=78.47.171.185
+Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (prime256v1) server-digest SHA256)
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6C88606A31E
-	for <linux-wpan@vger.kernel.org>; Thu, 26 Nov 2026 11:05:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org D6C88606A31E
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.a=rsa-sha256 header.s=dkim header.b=srQDhuHh
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 49A5A4E4179C;
-	Thu, 26 Nov 2026 11:05:13 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 181C960237;
-	Thu, 26 Nov 2026 11:05:13 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D46E011E6B363;
-	Thu, 26 Nov 2026 12:05:10 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1795691112; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=HFXWiHAkj1wetLgDRhC5nOLmwHP9VaiX8muRd2DNVr0=;
-	b=srQDhuHh3/St5JIqeUCZsPEPot46UAXyf1g0XXjWn6KPDCW2hNOcFBdSyxkkvIOLJtlGLo
-	1phyIDZTF/MxOUg31RFM29QT2zQrcBw0J1X1ghIoVYzDVxXm2vuqQtpSwTxBFRCuuIwRDu
-	LqTmK1pKiTxMbI2hyRcKyqRes6evzVE7eXQ7vweTt+4Y9VQ/eltvIyWcNVQenD52exccHi
-	4BlxZ++n1NnnsTc+6SUo7fJofsQZjbDzUbayLBHhQdxoV8svAbyj6TJxASgw4NaimwfXNf
-	kvzzyL+8Y8zjxoziWHtqGRL0l9UPZuPHNb2qLoKkuXXezNMZxswHs7I5IvLbtg==
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: =?utf-8?B?7J206rG07ZiV?= <leegun25@proton.me>
-Cc: alex.aring@gmail.com,  stefan@datenfreihafen.org,
-  linux-wpan@vger.kernel.org,  netdev@vger.kernel.org
-Subject: Re: [PATCH net] mac802154: take RTNL around ASSOC RESP transmission
-In-Reply-To: <-4vARCf0AvznsCw8bnUA-0HXh6HLIvZclkIK_aUJIf4ULKof8WuzgWidE8XZJi5Cndbt9iMVb_IiHNVA4W6GDQlym0Ny8mSRaxRCojci95o=@proton.me>
-	(=?utf-8?B?IuydtOqxtO2YlSIncw==?= message of "Wed, 25 Nov 2026 22:35:11
- +0000")
-References: <20261121150835.256812-1-leegun25@proton.me>
-	<87se0qqd5l.fsf@bootlin.com>
-	<-4vARCf0AvznsCw8bnUA-0HXh6HLIvZclkIK_aUJIf4ULKof8WuzgWidE8XZJi5Cndbt9iMVb_IiHNVA4W6GDQlym0Ny8mSRaxRCojci95o=@proton.me>
-User-Agent: mu4e 1.12.12; emacs 30.2
-Date: Thu, 26 Nov 2026 12:05:09 +0100
-Message-ID: <8733snyhsq.fsf@bootlin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C555606A31E;
+	Thu, 26 Nov 2026 11:43:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.2 smtp.subspace.kernel.org 9C555606A31E
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
+Received: from work.datenfreihafen.local (unknown [46.253.254.165])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: stefan@sostec.de)
+	by proxima.lasnet.de (Postfix) with ESMTPSA id 13EEBC0368;
+	Thu, 26 Nov 2026 12:43:54 +0100 (CET)
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: linux-wpan@vger.kernel.org,
+	alex.aring@gmail.com,
+	miquel.raynal@bootlin.com,
+	netdev@vger.kernel.org
+Subject: pull-request: ieee802154 for net 2026-11-26
+Date: Thu, 26 Nov 2026 12:43:49 +0100
+Message-ID: <20261126114349.2003459-1-stefan@datenfreihafen.org>
+X-Mailer: git-send-email 2.56.1
 X-Mailing-List: linux-wpan@vger.kernel.org
 List-Id: <linux-wpan.vger.kernel.org>
 List-Post: <mailto:linux-wpan@vger.kernel.org>
@@ -74,66 +57,87 @@ List-Unsubscribe: <mailto:linux-wpan+unsubscribe@vger.kernel.org>
 List-Owner: <mailto:linux-wpan+owner@vger.kernel.org>
 Precedence: list
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
 
-On 25/11/2026 at 22:35:11 GMT, =EC=9D=B4=EA=B1=B4=ED=98=95 <leegun25@proton=
-.me> wrote:
+Hello Jakub,Dave, Paolo.
 
-> Hi Miqu=C3=A8l,
->
-> On Wednesday, November 25th, 2026 at 03:48, Miquel Raynal <miquel.raynal@=
-bootlin.com> wrote:
->
->> First let's approach the numbers. 4ms is on a locally run simulator. You
->> are fixing a subsystem that plays with radios. A physical IEEE802154
->> radio would probably bring the usual bad case to > 100ms, and worth case
->> would be above the 1s boundary. So taking the RTNL lock as you do it
->> there would no longer warn in dev mode, but might lead to a DoS.
->
-> Thanks for pointing this out. I also found that taking the RTNL in
-> the association response worker causes association between two PHYs
-> on the same host to time out in hwsim.
->
->> Reviewing your patch makes me realize we do something even worse: up to
->> 10s waiting with the RTNL when waiting for an association response (for
->> which we are ouselves the initiator). That is slightly less a problem
->> since it is not remotely triggerable like the approach you propose, but
->> still.
->>
->> I don't remember why we *had* to take the RTNL in the mlme_tx path.
->>
->> Alex, maybe you remember why?
->
-> Commit ddd9ee7cda12 added the RTNL to prevent ndo_stop() from running
-> during MLME TX.
->
-> I also found your 2022 device_lock proposal:
->
-> https://lore.kernel.org/netdev/20220826144049.256134-11-miquel.raynal@boo=
-tlin.com/
->
-> I tried adding a per-PHY mutex shared by MLME TX, ndo_open() and
-> ndo_stop(). With this change, the association response worker uses
-> the new mutex without taking the RTNL. The existing MLME TX wrappers
-> retain their RTNL requirements.
->
-> In mac802154_hwsim, association between two PHYs on the same host
-> works, and I saw no warnings or hangs during 5,000 association
-> requests and 100 interface down/up cycles.
->
-> With an artificial TX delay of 1 second, bringing the interface
-> down still takes about 900 ms. ndo_stop() can still wait for an
-> in-flight association response TX while holding the RTNL.
->
-> As Alex pointed out in the 2022 discussion, page/channel changes
-> also need to be considered. These are not covered by the new mutex.
->
-> Would this be a reasonable direction for the fix? If so, I can send
-> a v2.
+An update from ieee802154 for your *net* tree:
 
-Yes please, let's see what it would look like.
+A bigger than usual round of bug fixes for ieee802154.
 
-Thanks,
-Miqu=C3=A8l
+Adi Prasan fixe a race in our async tx.
+
+Adriano Cordova is making sure a wpan device type is registered.
+
+Andrey Misiurov fixes the error propagation on netns rollback.
+
+Aryan Arora ensures cancellation of in progress scans during teardown.
+
+Lee Keon-Hyeong fixes up child handling and lookup.
+
+Maoyi Xie ensure proper ifindex handling for netns.
+
+Petr Vaganov ensures proper initialization of ieee802154 headers.
+
+Roman Gushchin fixes a type confusion in 6lowpan.
+
+Xuanqiang Luo fixes skb reference handling in the RX queues
+
+Yifan Zhang fixes beacon transmissions to use the correct interface.
+
+regards
+Stefan Schmidt
+
+The following changes since commit ef3e21c61baa74e39a49b75318bd4541562ec43f:
+
+  net/tcp-ao: fix reset key lookup for IPv4 segments on IPv6 listeners (2026-11-25 21:10:35 -0500)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan.git tags/ieee802154-for-net-2026-11-26
+
+for you to fetch changes up to b6148aaa5eb5b9f5471cc215f37eafb1299afe1c:
+
+  mac802154: look up children by extended address (2026-11-26 10:45:19 +0100)
+
+----------------------------------------------------------------
+Adi Prasan (1):
+      net: mac802154: fix race between slave_close() and in-flight async tx
+
+Adriano Cordova (1):
+      ieee802154: register a device type for the wpan dev
+
+Andrey Misiurov (1):
+      ieee802154: keep the original error after a netns rollback
+
+Aryan Arora (1):
+      mac802154: Cancel scan work synchronously during hardware teardown
+
+Lee Keon-Hyeong (2):
+      mac802154: free a replaced child
+      mac802154: look up children by extended address
+
+Maoyi Xie (1):
+      ieee802154: look up the wpan_phy dump ifindex in the caller's netns
+
+Petr Vaganov (1):
+      mac802154: fix uninit-value in ieee802154_header_create()
+
+Roman Gushchin (1):
+      6lowpan: fix netdev_priv() type confusion in lowpan_event()
+
+Xuanqiang Luo (1):
+      mac802154: avoid extra skb references in RX queues
+
+Yifan Zhang (1):
+      mac802154: validate pinned interface before beacon transmission
+
+ net/6lowpan/6lowpan_i.h   | 13 ++++++++++---
+ net/6lowpan/core.c        |  2 +-
+ net/ieee802154/core.c     | 10 +++++++++-
+ net/ieee802154/nl802154.c |  2 +-
+ net/mac802154/iface.c     | 11 +++++++----
+ net/mac802154/main.c      |  2 ++
+ net/mac802154/rx.c        |  4 ++--
+ net/mac802154/scan.c      | 47 +++++++++++++++++++++++++++--------------------
+ 8 files changed, 59 insertions(+), 32 deletions(-)
